@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2001, 2024, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2001, 2025, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -225,7 +225,6 @@ void G1CollectedHeap::register_region_with_region_attr(G1HeapRegion* r) {
 }
 
 void G1CollectedHeap::register_old_region_with_region_attr(G1HeapRegion* r) {
-  assert(!r->has_pinned_objects(), "must be");
   assert(r->rem_set()->is_complete(), "must be");
   _region_attr.set_in_old(r->hrm_index(), true);
   _rem_set->exclude_region_from_scan(r->hrm_index());
@@ -253,6 +252,7 @@ inline bool G1CollectedHeap::is_obj_filler(const oop obj) {
 }
 
 inline bool G1CollectedHeap::is_obj_dead(const oop obj, const G1HeapRegion* hr) const {
+  assert(!hr->is_free(), "looking up obj " PTR_FORMAT " in Free region %u", p2i(obj), hr->hrm_index());
   if (hr->is_in_parsable_area(obj)) {
     // This object is in the parsable part of the heap, live unless scrubbed.
     return is_obj_filler(obj);
@@ -314,6 +314,10 @@ inline void G1CollectedHeap::set_humongous_is_live(oop obj) {
 inline bool G1CollectedHeap::is_collection_set_candidate(const G1HeapRegion* r) const {
   const G1CollectionSetCandidates* candidates = collection_set()->candidates();
   return candidates->contains(r);
+}
+
+inline uint G1CollectedHeap::eden_target_length() const {
+  return _policy->young_list_target_length() - survivor_regions_count();
 }
 
 #endif // SHARE_GC_G1_G1COLLECTEDHEAP_INLINE_HPP

@@ -1,6 +1,6 @@
 /*
- * Copyright (c) 1997, 2023, Oracle and/or its affiliates. All rights reserved.
- * Copyright (c) 2014, 2108, Red Hat Inc. All rights reserved.
+ * Copyright (c) 1997, 2025, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2014, 2025, Red Hat Inc. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -83,7 +83,6 @@ public:
   bool is_safepoint_poll();
   bool is_movz();
   bool is_movk();
-  bool is_sigill_not_entrant();
   bool is_stop();
 
 protected:
@@ -174,6 +173,7 @@ public:
   int displacement() const { return (int_at(displacement_offset) << 6) >> 4; }
   address displacement_address() const { return addr_at(displacement_offset); }
   address return_address() const { return addr_at(return_address_offset); }
+  address raw_destination() const { return instruction_address() + displacement(); }
   address destination() const;
 
   void set_destination(address dest) {
@@ -213,9 +213,7 @@ public:
   //
   // Used in the runtime linkage of calls; see class CompiledIC.
   // (Cf. 4506997 and 4479829, where threads witnessed garbage displacements.)
-
-  // The parameter assert_lock disables the assertion during code generation.
-  void set_destination_mt_safe(address dest, bool assert_lock = true);
+  void set_destination_mt_safe(address dest);
 
   address get_trampoline();
 #if INCLUDE_JVMCI
@@ -361,9 +359,6 @@ public:
 
   // Insertion of native jump instruction
   static void insert(address code_pos, address entry);
-  // MT-safe insertion of native jump at verified method entry
-  static void check_verified_entry_alignment(address entry, address verified_entry);
-  static void patch_verified_entry(address entry, address verified_entry, address dest);
 };
 
 inline NativeJump* nativeJump_at(address address) {
@@ -384,7 +379,6 @@ public:
   address jump_destination() const;
   void set_jump_destination(address dest);
 
-  static void insert_unconditional(address code_pos, address entry);
   static void replace_mt_safe(address instr_addr, address code_buffer);
   static void verify();
 };

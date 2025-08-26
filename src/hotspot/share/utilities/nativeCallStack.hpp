@@ -27,6 +27,7 @@
 
 #include "memory/allocation.hpp"
 #include "nmt/nmtCommon.hpp"
+#include "utilities/hashTable.hpp"
 #include "utilities/ostream.hpp"
 
 /*
@@ -54,6 +55,7 @@
 class MemTracker;
 
 class NativeCallStack : public StackObj {
+  friend class VMTWithVMATreeTest;
 private:
   address       _stack[NMT_TrackingStackDepth];
   static const NativeCallStack _empty_stack;
@@ -123,6 +125,7 @@ public:
     return (unsigned int)hash;
   }
 
+  void print_frame(outputStream* out, address pc) const;
   void print_on(outputStream* out) const;
 };
 
