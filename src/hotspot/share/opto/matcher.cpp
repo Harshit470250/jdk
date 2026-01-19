@@ -43,6 +43,7 @@
 #include "runtime/os.inline.hpp"
 #include "runtime/sharedRuntime.hpp"
 #include "utilities/align.hpp"
+#include "print/print.hpp"
 
 OptoReg::Name OptoReg::c_frame_pointer;
 
@@ -136,8 +137,6 @@ OptoReg::Name Compile::compute_old_SP() {
   return OptoReg::stack2reg(align_up(fixed + preserve, (int)Matcher::stack_alignment_in_slots()));
 }
 
-
-
 #ifdef ASSERT
 void Matcher::verify_new_nodes_only(Node* xroot) {
   // Make sure that the new graph only references new nodes
@@ -149,6 +148,8 @@ void Matcher::verify_new_nodes_only(Node* xroot) {
     Node* n = worklist.pop();
     if (visited.test_set(n->_idx)) {
       continue;
+    }
+    if(n->Opcode() == 25) {
     }
     assert(C->node_arena()->contains(n), "dead node");
     assert(!n->is_Initialize() || n->as_Initialize()->number_of_projs(TypeFunc::Memory) == 1,
@@ -1023,6 +1024,11 @@ Node *Matcher::xform( Node *n, int max_stack ) {
     C->check_node_count(NodeLimitFudgeFactor, "too many nodes matching instructions");
     if (C->failing()) return nullptr;
     n = mstack.node();          // Leave node on stack
+
+    if(n->_idx == 736 && n->_igv_idx == 937 && n->class_id() == 512 && n->Opcode() == 25 && n->req() == 4) {
+      breakpoint();
+    }
+
     Node_State nstate = mstack.state();
     if (nstate == Visit) {
       mstack.set_state(Post_Visit);
