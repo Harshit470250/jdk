@@ -833,7 +833,8 @@ const TypeFunc* make_clone_type() {
 }
 
 static inline const TypeFunc* clone_type() {
-  return OptoRuntime::clone_type(); 
+  assert(OptoRuntime::_clone_type_Type != nullptr, "should be initialized");
+  return OptoRuntime::_clone_type_Type;
 }
 
 #define XTOP LP64_ONLY(COMMA phase->top())
