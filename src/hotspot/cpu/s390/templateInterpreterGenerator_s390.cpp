@@ -1192,7 +1192,11 @@ void TemplateInterpreterGenerator::generate_fixed_frame(bool native_call) {
   __ z_stg(Z_R1_scratch, _z_ijava_state_neg(cpoolCache), fp);
 
   // Get mirror and store it in the frame as GC root for this Method*.
-  __ load_mirror_from_const_method(Z_R1_scratch, const_method);
+  // __ load_mirror_from_const_method(Z_R1_scratch, const_method);
+  __ mem2reg_opt(Z_R1_scratch, Address(const_method, ConstMethod::constants_offset()));
+  __ mem2reg_opt(Z_R1_scratch, Address(Z_R1_scratch, ConstantPool::pool_holder_offset()));
+  __ mem2reg_opt(Z_R1_scratch, Address(Z_R1_scratch, Klass::java_mirror_offset()));
+  __ resolve_oop_handle(Z_R1_scratch, Z_R0_scratch, Z_R1_scratch);
   __ z_stg(Z_R1_scratch, _z_ijava_state_neg(mirror), fp);
 
   BLOCK_COMMENT("} generate_fixed_frame: initialize interpreter state");
@@ -2028,7 +2032,7 @@ address TemplateInterpreterGenerator::generate_currentThread() {
   uint64_t entry_off = __ offset();
 
   __ z_lg(Z_RET, Address(Z_thread, JavaThread::threadObj_offset()));
-  __ resolve_oop_handle(Z_RET);
+  __ resolve_oop_handle(Z_RET, Z_R0_scratch, Z_R1_scratch);
 
   // Restore caller sp for c2i case.
   __ resize_frame_absolute(Z_R10, Z_R0, true); // Cut the stack back to where the caller started.
