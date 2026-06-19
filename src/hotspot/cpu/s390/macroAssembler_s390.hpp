@@ -484,6 +484,10 @@ class MacroAssembler: public Assembler {
   // Pop current C frame and restore return PC register (Z_R14).
   void pop_frame_restore_retPC(int frame_size_in_bytes);
 
+#ifdef ASSERT
+  void clobber_volatile_registers(Register excluded_register[], int n);
+#endif // ASSERT
+
   //
   // Calls
   //
@@ -886,7 +890,6 @@ class MacroAssembler: public Assembler {
                    Register Rbase = Z_R1, int pow2_offset = -1);
 
   void resolve_oop_handle(Register result, Register tmp1, Register tmp2);
-  void load_mirror_from_const_method(Register mirror, Register const_method);
   void load_method_holder(Register holder, Register method);
 
   //--------------------------
@@ -1108,6 +1111,8 @@ class MacroAssembler: public Assembler {
 
   void load_on_condition_imm_32(Register dst, int64_t i2, branch_condition cc);
   void load_on_condition_imm_64(Register dst, int64_t i2, branch_condition cc);
+
+  void profile_receiver_type(Register recv, Register mdp, int mdp_offset, Register tmp1);
 };
 
 #ifdef ASSERT

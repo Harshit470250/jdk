@@ -3892,7 +3892,16 @@ const TypeInt* CountedLoopConverter::filtered_type_from_dominators(Node* val, No
           if (rtn_t == nullptr) {
             rtn_t = if_t;
           } else {
-            rtn_t = rtn_t->join(if_t)->is_int();
+            const Type* join_t = rtn_t->join(if_t);
+            if (!join_t->isa_int()) {
+              // We may have encountered multiple if conditions, that have no
+              // overlap, and produce an empty/top type. Returning nullptr
+              // is conservative, it means we do not constrain the type, which
+              // will just prevent further optimiziations.
+              assert(join_t->empty(), "top");
+              return nullptr;
+            }
+            rtn_t = join_t->is_int();
           }
         }
       }
@@ -5938,8 +5947,8 @@ void PhaseIdealLoop::set_idom(Node* d, Node* n, uint dom_depth) {
   uint idx = d->_idx;
   if (idx >= _idom_size) {
     uint newsize = next_power_of_2(idx);
-    _idom      = REALLOC_ARENA_ARRAY(&_arena, Node*,     _idom,_idom_size,newsize);
-    _dom_depth = REALLOC_ARENA_ARRAY(&_arena,  uint, _dom_depth,_idom_size,newsize);
+    _idom      = REALLOC_ARENA_ARRAY(&_arena, _idom, _idom_size, newsize);
+    _dom_depth = REALLOC_ARENA_ARRAY(&_arena, _dom_depth, _idom_size, newsize);
     memset( _dom_depth + _idom_size, 0, (newsize - _idom_size) * sizeof(uint) );
     _idom_size = newsize;
   }
