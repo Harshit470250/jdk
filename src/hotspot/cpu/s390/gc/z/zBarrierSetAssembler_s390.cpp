@@ -656,15 +656,8 @@ void ZBarrierSetAssembler::generate_disjoint_oop_copy(MacroAssembler* masm, bool
   //__ bind(skip);
 //
 
-  int offset = 8;
-  __ restore_return_pc();                             offset += 8;
-  __ z_lg(Z_R5, offset, Z_SP);                        offset += 8;
-  __ z_lg(Z_R6, offset, Z_SP);                        offset += 8;
-  __ z_lg(Z_R7, offset, Z_SP);                        offset += 8;
-  __ z_lg(Z_R8, offset, Z_SP);                        offset += 8;
-  __ z_lg(Z_R9, offset, Z_SP);                        offset += 8;
-  __ z_lg(Z_R10, offset, Z_SP);                       offset += 8;
-  __ z_lg(Z_R11, offset, Z_SP);
+  __ restore_return_pc();
+  __ z_lmg(Z_R5, Z_R11, 16, Z_SP);
   __ pop_frame();
 
   __ z_xgr(Z_RET, Z_RET);
@@ -707,18 +700,8 @@ void ZBarrierSetAssembler::generate_conjoint_oop_copy(MacroAssembler* masm, bool
 
   __ bind(done);
 
-  //__ load_const_optimized(Z_R1, (uintptr_t)&conjoint_end_fubar);
-  //__ z_agsi(0, Z_R1, 1);
-
-  int offset = 8;
-  __ restore_return_pc();                             offset += 8;
-  __ z_lg(Z_R5, offset, Z_SP);                        offset += 8;
-  __ z_lg(Z_R6, offset, Z_SP);                        offset += 8;
-  __ z_lg(Z_R7, offset, Z_SP);                        offset += 8;
-  __ z_lg(Z_R8, offset, Z_SP);                        offset += 8;
-  __ z_lg(Z_R9, offset, Z_SP);                        offset += 8;
-  __ z_lg(Z_R10, offset, Z_SP);                       offset += 8;
-  __ z_lg(Z_R11, offset, Z_SP);
+  __ restore_return_pc();
+  __ z_lmg(Z_R5, Z_R11, 16, Z_SP);
   __ pop_frame();
 
   __ z_xgr(Z_RET, Z_RET);
@@ -740,20 +723,10 @@ void ZBarrierSetAssembler::arraycopy_prologue(MacroAssembler* masm,
 
   __ block_comment("arraycopy_prologue (zgc) {");
 
-//  __ load_const_optimized(Z_R1, (uintptr_t)&prolog_fubar);
-//  __ z_agsi(0, Z_R1, 1);
-
   int nbytes_save = 9 * BytesPerWord;                 // SP, PC, R5, R6, R7, R10, R11
-  int offset = 0;
-  __ push_frame(nbytes_save);                         offset += 8;
-  __ save_return_pc();                                offset += 8;
-  __ z_stg(Z_R5, offset, Z_SP);                       offset += 8;
-  __ z_stg(Z_R6, offset, Z_SP);                       offset += 8;
-  __ z_stg(Z_R7, offset, Z_SP);                       offset += 8;
-  __ z_stg(Z_R8, offset, Z_SP);                       offset += 8;
-  __ z_stg(Z_R9, offset, Z_SP);                       offset += 8;
-  __ z_stg(Z_R10, offset, Z_SP);                      offset += 8;
-  __ z_stg(Z_R11, offset, Z_SP);
+  __ push_frame(nbytes_save);
+  __ save_return_pc();
+  __ z_stmg(Z_R5, Z_R11, 16, Z_SP);
 
   load_copy_masks(masm, _load_bad_mask, _store_bad_mask, _store_good_mask, dest_uninitialized);
 
