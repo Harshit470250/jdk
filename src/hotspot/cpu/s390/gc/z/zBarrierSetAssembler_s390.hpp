@@ -55,120 +55,120 @@ const int ZBarrierRelocationFormatMarkBadBeforeTest = 3;
 
 class ZBarrierSetAssembler : public ZBarrierSetAssemblerBase {
 public:
-virtual void load_at(MacroAssembler* masm,
-                     DecoratorSet decorators,
-                     BasicType type,
-                     const Address& src,
-                     Register dst,
-                     Register temp1,
-                     Register temp2,
-                     Label *L_handle_null = nullptr);
+  virtual void load_at(MacroAssembler* masm,
+                       DecoratorSet decorators,
+                       BasicType type,
+                       const Address& src,
+                       Register dst,
+                       Register temp1,
+                       Register temp2,
+                       Label *L_handle_null = nullptr);
 
-void store_barrier_fast(MacroAssembler* masm,
-                        Address ref_addr,
-                        Register rnew_zaddress,
-                        Register rnew_zpointer,
-                        bool in_nmethod,
-                        bool is_atomic,
-                        Label& medium_path,
-                        Label& medium_path_continuation) const;
-
-void store_barrier_medium(MacroAssembler* masm,
+  void store_barrier_fast(MacroAssembler* masm,
                           Address ref_addr,
-                          Register temp1,
-                          Register temp2,
-                          bool is_native,
+                          Register rnew_zaddress,
+                          Register rnew_zpointer,
+                          bool in_nmethod,
                           bool is_atomic,
-                          Label& medium_path_continuation,
-                          Label& slow_path,
-                          Label& slow_path_continuation) const;
+                          Label& medium_path,
+                          Label& medium_path_continuation) const;
 
-virtual void store_at(MacroAssembler* masm,
-                      DecoratorSet decorators,
-                      BasicType type,
-                      const Address& dst,
-                      Register src,
-                      Register temp1,
-                      Register temp2,
-                      Register temp3);
+  void store_barrier_medium(MacroAssembler* masm,
+                            Address ref_addr,
+                            Register temp1,
+                            Register temp2,
+                            bool is_native,
+                            bool is_atomic,
+                            Label& medium_path_continuation,
+                            Label& slow_path,
+                            Label& slow_path_continuation) const;
 
-void copy_load_at(MacroAssembler* masm, Register zpointer, Address src);
+  virtual void store_at(MacroAssembler* masm,
+                        DecoratorSet decorators,
+                        BasicType type,
+                        const Address& dst,
+                        Register src,
+                        Register temp1,
+                        Register temp2,
+                        Register temp3);
 
-void copy_store_at(MacroAssembler* masm, Register zpointer, Register dst,
-                   bool dest_uninitialized);
+  void copy_load_at(MacroAssembler* masm, Register zpointer, Address src);
 
-void copy_load_at_vec(MacroAssembler* masm, VectorRegister Vdata, Register zpointer,
-                      Register src);
+  void copy_store_at(MacroAssembler* masm, Register zpointer, Register dst,
+                     bool dest_uninitialized);
 
-void copy_store_at_vec(MacroAssembler* masm, VectorRegister Vdata, Register zpointer,
-                       Register dst, bool dest_uninitialized);
+  void copy_load_at_vec(MacroAssembler* masm, VectorRegister Vdata, Register zpointer,
+                        Register src);
 
-void generate_disjoint_oop_copy(MacroAssembler* masm, bool dest_unintialized);
+  void copy_store_at_vec(MacroAssembler* masm, VectorRegister Vdata, Register zpointer,
+                         Register dst, bool dest_uninitialized);
 
-void generate_conjoint_oop_copy(MacroAssembler* masm, bool dest_unintialized);
+  void generate_disjoint_oop_copy(MacroAssembler* masm, bool dest_unintialized);
 
-void load_copy_masks(MacroAssembler* masm,
-                     Register load_bad_mask,
-                     Register store_bad_mask,
-                     Register store_good_mask,
-                     bool dest_uninitialized) const;
+  void generate_conjoint_oop_copy(MacroAssembler* masm, bool dest_unintialized);
 
-virtual void arraycopy_prologue(MacroAssembler* masm,
-                                DecoratorSet decorators,
-                                BasicType type,
-                                Register src,
-                                Register dst,
-                                Register count);
+  void load_copy_masks(MacroAssembler* masm,
+                       Register load_bad_mask,
+                       Register store_bad_mask,
+                       Register store_good_mask,
+                       bool dest_uninitialized) const;
 
-virtual void try_resolve_jobject_in_native(MacroAssembler* masm,
-                                           Register jni_env,
-                                           Register robj,
-                                           Register temp,
-                                           Label& slowpath);
+  virtual void arraycopy_prologue(MacroAssembler* masm,
+                                  DecoratorSet decorators,
+                                  BasicType type,
+                                  Register src,
+                                  Register dst,
+                                  Register count);
+
+  virtual void try_resolve_jobject_in_native(MacroAssembler* masm,
+                                             Register jni_env,
+                                             Register robj,
+                                             Register temp,
+                                             Label& slowpath);
 
 #ifdef COMPILER1
 
-void generate_c1_color(LIR_Assembler* ce, LIR_Opr ref) const;
-void generate_c1_uncolor(LIR_Assembler* ce, LIR_Opr ref) const;
+  void generate_c1_color(LIR_Assembler* ce, LIR_Opr ref) const;
+  void generate_c1_uncolor(LIR_Assembler* ce, LIR_Opr ref) const;
 
-void generate_c1_load_barrier(LIR_Assembler* ce,
-                              LIR_Opr ref,
-                              ZLoadBarrierStubC1* stub,
-                              bool on_non_string) const;
+  void generate_c1_load_barrier(LIR_Assembler* ce,
+                                LIR_Opr ref,
+                                ZLoadBarrierStubC1* stub,
+                                bool on_non_string) const;
 
-void generate_c1_load_barrier_stub(LIR_Assembler* ce,
-                                   ZLoadBarrierStubC1* stub) const;
+  void generate_c1_load_barrier_stub(LIR_Assembler* ce,
+                                     ZLoadBarrierStubC1* stub) const;
 
-void generate_c1_store_barrier(LIR_Assembler* ce,
-                               LIR_Address* addr,
-                               LIR_Opr new_zaddress,
-                               LIR_Opr new_zpointer,
-                               ZStoreBarrierStubC1* stub) const;
+  void generate_c1_store_barrier(LIR_Assembler* ce,
+                                 LIR_Address* addr,
+                                 LIR_Opr new_zaddress,
+                                 LIR_Opr new_zpointer,
+                                 ZStoreBarrierStubC1* stub) const;
 
-void generate_c1_store_barrier_stub(LIR_Assembler* ce,
-                                    ZStoreBarrierStubC1* stub) const;
+  void generate_c1_store_barrier_stub(LIR_Assembler* ce,
+                                      ZStoreBarrierStubC1* stub) const;
 
-void generate_c1_load_barrier_runtime_stub(StubAssembler *sasm,
-                                           DecoratorSet decorators) const;
+  void generate_c1_load_barrier_runtime_stub(StubAssembler *sasm,
+                                             DecoratorSet decorators) const;
 
-void generate_c1_store_barrier_runtime_stub(StubAssembler* sasm,
-                                            bool self_healing) const;
+  void generate_c1_store_barrier_runtime_stub(StubAssembler* sasm,
+                                              bool self_healing) const;
 
 #endif // COMPILER1
 
 #ifdef COMPILER2
 
-void generate_c2_load_barrier_stub(MacroAssembler* masm, ZLoadBarrierStubC2* stub) const;
+  void generate_c2_load_barrier_stub(MacroAssembler* masm, ZLoadBarrierStubC2* stub) const;
 
-void generate_c2_store_barrier_stub(MacroAssembler* masm, ZStoreBarrierStubC2* stub) const;
+  void generate_c2_store_barrier_stub(MacroAssembler* masm, ZStoreBarrierStubC2* stub) const;
 
 #endif // COMPILER2
 
-void check_oop(MacroAssembler *masm, Register obj, const char* msg);
+  void check_oop(MacroAssembler *masm, Register obj, const char* msg);
 
-void patch_barrier_relocation(address addr, int format);
+  void patch_barrier_relocation(address addr, int format);
 
-void patch_barriers() {}
+  void patch_barriers() {}
 
 };
 #endif // CPU_S390_GC_Z_ZBARRIERSETASSEMBLER_S390_HPP
