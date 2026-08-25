@@ -83,15 +83,6 @@ public:
                             Label& slow_path,
                             Label& slow_path_continuation) const;
 
-  virtual void store_at(MacroAssembler* masm,
-                        DecoratorSet decorators,
-                        BasicType type,
-                        const Address& dst,
-                        Register src,
-                        Register temp1,
-                        Register temp2,
-                        Register temp3);
-
   void copy_load_at(MacroAssembler* masm, Register zpointer, Address src);
 
   void copy_store_at(MacroAssembler* masm, Register zpointer, Register dst,
@@ -100,11 +91,8 @@ public:
   void copy_load_at_vec(MacroAssembler* masm, VectorRegister Vdata, Register zpointer,
                         Register src);
 
-  void copy_store_at_slow(MacroAssembler* masm,
-                          Register addr,
-                          Label& medium_path,
-                          Label& continuation,
-                          bool dest_uninitialized) const;
+  void copy_store_at_vec(MacroAssembler* masm, VectorRegister Vdata, Register zpointer,
+                         Register dst, bool dest_uninitialized);
 
   void generate_disjoint_oop_copy(MacroAssembler* masm, bool dest_uninitialized);
 

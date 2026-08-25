@@ -1477,7 +1477,7 @@ class Assembler : public AbstractAssembler {
     bcondLogBorrow           =  /* bcondLogZero_Borrow | */ bcondLogNotZero_Borrow,
     // Vector compare instructions
     bcondVAlltrue    =  8,  // All  vector elements evaluate true
-    bcondVMixed      =  4,  // Some vector elements evaluate true, some false
+    bcondVMixed      =  2,  // Some vector elements evaluate true, some false
     bcondVAllfalse   =  1,  // All  vector elements evaluate false
     // string search instructions
     bcondFound       =  4,

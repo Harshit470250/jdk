@@ -456,6 +456,10 @@ void ZBarrierSetAssembler::copy_load_at(MacroAssembler* masm, Register zpointer,
   //__ load_const_optimized(Z_R9, (uintptr_t)&fubar);
   //__ z_agsi(0, Z_R9, 1);
 
+  }
+
+  __ bind(load_done);
+
   // Remove color so that store side (vectorized or non-vectorized) can inject
   // the sotore-good color with an or instruction
   __ z_nill(zpointer, 0x0);
@@ -658,17 +662,12 @@ void ZBarrierSetAssembler::generate_disjoint_oop_copy(MacroAssembler* masm, bool
 
 void ZBarrierSetAssembler::generate_conjoint_oop_copy(MacroAssembler* masm, bool dest_uninitialized) {
   const Register zpointer = Z_R1;
-<<<<<<< HEAD
   const VectorRegister Vdata = Z_V0;
 
 //  __ load_const_optimized(Z_R1, (uintptr_t)&conjoint_fubar);
 //  __ z_agsi(0, Z_R1, 1);
 
   Label done;
-=======
-  NearLabel done, loop;
-  Label load_bad, load_good, store_bad, store_good;
->>>>>>> 974d079f5e2 (use NearLabel)
   __ z_slag(Z_R0, Z_ARG3, 3);
   __ branch_optimized(Assembler::bcondZero, done);
   // Point behind last elements and copy backwards.
@@ -729,6 +728,8 @@ void ZBarrierSetAssembler::arraycopy_prologue(MacroAssembler* masm,
 
   __ block_comment("} arraycopy_prologue (zgc)");
 }
+
+long fubar = 0;
 
 void ZBarrierSetAssembler::load_copy_masks(MacroAssembler* masm,
                                            Register load_bad_mask,
