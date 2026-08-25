@@ -57,8 +57,6 @@
 // For a more detailed description of the stub routine structure
 // see the comment in stubRoutines.hpp.
 
-long fubar = 0;
-
 #ifdef PRODUCT
 #define __ _masm->
 #else
@@ -1223,8 +1221,6 @@ class StubGenerator: public StubCodeGenerator {
       const int stride     = -8;
       const int vec_stride = -32;
 
-      __ load_const_optimized(stride_reg, (uintptr_t)&fubar);
-      __ z_agsi(0, stride_reg, 1);
       __ load_const_optimized(stride_reg, stride); // Prepare for DW copy loop.
 
       if (element_size == 8)    // Nothing to do here.
