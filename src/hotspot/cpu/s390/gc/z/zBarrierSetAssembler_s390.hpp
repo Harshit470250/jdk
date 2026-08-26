@@ -100,12 +100,15 @@ public:
   void copy_load_at_vec(MacroAssembler* masm, VectorRegister Vdata, Register zpointer,
                         Register src);
 
-  void copy_store_at_vec(MacroAssembler* masm, VectorRegister Vdata, Register zpointer,
-                         Register dst, bool dest_uninitialized);
+  void copy_store_at_slow(MacroAssembler* masm,
+                          Register addr,
+                          Label& medium_path,
+                          Label& continuation,
+                          bool dest_uninitialized) const;
 
-  void generate_disjoint_oop_copy(MacroAssembler* masm, bool dest_unintialized);
+  void generate_disjoint_oop_copy(MacroAssembler* masm, bool dest_uninitialized);
 
-  void generate_conjoint_oop_copy(MacroAssembler* masm, bool dest_unintialized);
+  void generate_conjoint_oop_copy(MacroAssembler* masm, bool dest_uninitialized);
 
   void load_copy_masks(MacroAssembler* masm,
                        Register load_bad_mask,
