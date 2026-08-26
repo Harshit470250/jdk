@@ -163,7 +163,7 @@ void ZBarrierSetAssembler::load_at(MacroAssembler* masm,
   // Fast Path
   //
 
-  // Load adress
+  // Load address
   __ z_lay(temp1, src);
 
   // Load oop at address
