@@ -156,8 +156,7 @@ void ZBarrierSetAssembler::load_at(MacroAssembler* masm,
 
   assert_different_registers(temp1, dst);
 
-  Label done;
-  Label uncolor;
+  NearLabel done, uncolor;
 
   //
   // Fast Path
@@ -380,7 +379,7 @@ void ZBarrierSetAssembler::store_at(MacroAssembler* masm,
       }
       __ z_og(temp1, Address(Z_thread, ZThreadLocalData::store_good_mask_offset()));
     } else {
-      Label done;
+      NearLabel done;
       Label medium;
       Label medium_continuation;
       Label slow;
@@ -659,12 +658,17 @@ void ZBarrierSetAssembler::generate_disjoint_oop_copy(MacroAssembler* masm, bool
 
 void ZBarrierSetAssembler::generate_conjoint_oop_copy(MacroAssembler* masm, bool dest_uninitialized) {
   const Register zpointer = Z_R1;
+<<<<<<< HEAD
   const VectorRegister Vdata = Z_V0;
 
 //  __ load_const_optimized(Z_R1, (uintptr_t)&conjoint_fubar);
 //  __ z_agsi(0, Z_R1, 1);
 
   Label done;
+=======
+  NearLabel done, loop;
+  Label load_bad, load_good, store_bad, store_good;
+>>>>>>> 974d079f5e2 (use NearLabel)
   __ z_slag(Z_R0, Z_ARG3, 3);
   __ branch_optimized(Assembler::bcondZero, done);
   // Point behind last elements and copy backwards.
@@ -755,7 +759,7 @@ void ZBarrierSetAssembler::try_resolve_jobject_in_native(MacroAssembler* masm,
                                                          Label& slowpath) {
   BLOCK_COMMENT("ZBarrierSetAssembler::try_resolve_jobject_in_native {");
 
-  Label done, tagged, weak_tagged, uncolor;
+  NearLabel done, tagged, weak_tagged, uncolor;
   Address load_bad_mask = load_bad_mask_from_jni_env(jni_env),
           mark_bad_mask = mark_bad_mask_from_jni_env(jni_env);
 
@@ -1158,7 +1162,7 @@ void ZBarrierSetAssembler::check_oop(MacroAssembler *masm, Register obj, const c
 
   __ z_stg(Z_R1, offset, Z_SP);
 
-  Label done, skip_uncolor;
+  NearLabel done, skip_uncolor;
   // Skip (colored) null
   __ z_srlg(Z_R1, obj, ZPointerLoadShift);
   __ z_ltgr(Z_R1, Z_R1);
