@@ -66,7 +66,7 @@
                                     do_arch_entry,                      \
                                     do_arch_entry_init,                 \
                                     do_arch_entry_array)                \
-  do_arch_blob(final, 20000)                                            \
+  do_arch_blob(final, 24000)                                            \
 
 
 #endif // CPU_S390_STUBDECLARATIONS_HPP
