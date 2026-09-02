@@ -58,11 +58,6 @@ long conjoint_end_fubar = 0;
 long fubar = 0;
 long prolog_fubar = 0;
 long store_fubar = 0;
-long add_fubar = 0;
-long idk_fubar = 0;
-long start_addr = 0;
-long end_addr = 0;
-long copy_count = 0;
 
 class ZRuntimeCallSpill {
 private:
@@ -458,7 +453,14 @@ void ZBarrierSetAssembler::copy_load_at(MacroAssembler* masm, Register zpointer,
 
   }
 
+  __ z_vrepg(_vec_load_bad, _vec_load_bad, 0);
+  __ z_vrepg(_vec_store_bad, _vec_store_bad, 0);
+  __ z_vrepg(_vec_store_good, _vec_store_good, 0);
+
   __ bind(load_done);
+
+  //__ load_const_optimized(Z_R9, (uintptr_t)&fubar);
+  //__ z_agsi(0, Z_R9, 1);
 
   // Remove color so that store side (vectorized or non-vectorized) can inject
   // the sotore-good color with an or instruction
@@ -525,8 +527,6 @@ void ZBarrierSetAssembler::copy_load_at_vec(MacroAssembler* masm, VectorRegister
   // TODO: What is wrong with bcondVAllFalse
   __ branch_optimized(Assembler::bcondZero, done);
 
-  //__ load_const_optimized(Z_R9, (uintptr_t)&fubar);
-  //__ z_agsi(0, Z_R9, 1);
   copy_load_at(masm, zpointer, Address(src, 0));
   __ z_vlvgg(Vdata, zpointer, 0);
   copy_load_at(masm, zpointer, Address(src, 8));
@@ -594,15 +594,8 @@ void ZBarrierSetAssembler::generate_disjoint_oop_copy(MacroAssembler* masm, bool
   const Register zpointer = Z_R1;
   const VectorRegister Vdata = Z_V0;
 
-//  __ load_const_optimized(Z_R1, (uintptr_t)&start_addr);
-//  __ z_stg(Z_ARG1, Address(Z_R1));
-//  __ load_const_optimized(Z_R1, (uintptr_t)&end_addr);
-//  __ z_stg(Z_ARG2, Address(Z_R1));
-//  __ load_const_optimized(Z_R1, (uintptr_t)&copy_count);
-//  __ z_stg(Z_ARG3, Address(Z_R1));
-
-  //__ load_const_optimized(Z_R1, (uintptr_t)&disjoint_fubar);
-  //__ z_agsi(0, Z_R1, 1);
+  __ load_const_optimized(Z_R1, (uintptr_t)&disjoint_fubar);
+  __ z_agsi(0, Z_R1, 1);
 
   Label done;
   __ z_cghi(Z_ARG3, 0);
@@ -651,7 +644,6 @@ void ZBarrierSetAssembler::generate_disjoint_oop_copy(MacroAssembler* masm, bool
   //__ z_brct(Z_R10, check);
   //__ bind(skip);
 //
-
   __ restore_return_pc();
   __ z_lmg(Z_R5, Z_R11, 16, Z_SP);
   __ pop_frame();
@@ -728,8 +720,6 @@ void ZBarrierSetAssembler::arraycopy_prologue(MacroAssembler* masm,
 
   __ block_comment("} arraycopy_prologue (zgc)");
 }
-
-long fubar = 0;
 
 void ZBarrierSetAssembler::load_copy_masks(MacroAssembler* masm,
                                            Register load_bad_mask,
