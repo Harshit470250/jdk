@@ -58,6 +58,7 @@ long conjoint_end_fubar = 0;
 long fubar = 0;
 long prolog_fubar = 0;
 long store_fubar = 0;
+long add_fubar = 0;
 
 class ZRuntimeCallSpill {
 private:
@@ -468,13 +469,17 @@ void ZBarrierSetAssembler::copy_store_at(MacroAssembler* masm, Register zpointer
     __ z_ngrk(Z_R0_scratch, Z_R0_scratch, _store_bad_mask);
     __ branch_optimized(Assembler::bcondZero, store);
 
-    __ load_const_optimized(Z_tmp_1, (uintptr_t)&store_fubar);
+    __ load_const_optimized(Z_tmp_1, (uintptr_t)&add_fubar);
     __ z_agsi(0, Z_tmp_1, 1);
 
     store_barrier_buffer_add(masm, Address(dst), Z_tmp_1, Z_tmp_2, store_bad);
     __ branch_optimized(Assembler::bcondAlways, store);
 
     __ bind(store_bad);
+    __ load_const_optimized(Z_tmp_1, (uintptr_t)&store_fubar);
+    __ z_agsi(0, Z_tmp_1, 1);
+
+
     {
       // Call VM
       ZRuntimeCallSpill rcs(masm, noreg);
@@ -515,8 +520,8 @@ void ZBarrierSetAssembler::copy_load_at_vec(MacroAssembler* masm, VectorRegister
   // TODO: What is wrong with bcondVAllFalse
   __ branch_optimized(Assembler::bcondZero, done);
 
-  __ load_const_optimized(Z_R9, (uintptr_t)&fubar);
-  __ z_agsi(0, Z_R9, 1);
+  //__ load_const_optimized(Z_R9, (uintptr_t)&fubar);
+  //__ z_agsi(0, Z_R9, 1);
   copy_load_at(masm, zpointer, Address(src, 0));
   __ z_vlvgg(Vdata, zpointer, 0);
   copy_load_at(masm, zpointer, Address(src, 8));
@@ -603,27 +608,27 @@ void ZBarrierSetAssembler::generate_disjoint_oop_copy(MacroAssembler* masm, bool
   __ add2reg(Z_ARG3, -1);
 
   __ bind(done);
-  __ load_const_optimized(Z_R1, (uintptr_t)&disjoint_end_fubar);
-  __ z_agsi(0, Z_R1, 1);
+  //__ load_const_optimized(Z_R1, (uintptr_t)&disjoint_end_fubar);
+  //__ z_agsi(0, Z_R1, 1);
 
-  Label check, ok, skip;
-  __ compare64_and_branch(Z_R10, 0x0, Assembler::bcondEqual, skip);
-
-  __ z_sllg(Z_R0, Z_R10, 3);
-  __ z_sgr(Z_ARG1, Z_R0);
-  __ z_sgr(Z_ARG2, Z_R0);
-
-  __ bind(check);
-  __ z_lg(Z_R0, Address(Z_ARG1));
-  __ z_lg(Z_R1, Address(Z_ARG2));
-  __ compare64_and_branch(Z_R0, Z_R1, Assembler::bcondEqual, ok);
-  __ stop("not equal");
-  __ bind(ok);
-  __ add2reg(Z_ARG1, 8);
-  __ add2reg(Z_ARG2, 8);
-  __ z_brct(Z_R10, check);
-  __ bind(skip);
-
+  //Label check, ok, skip;
+  //__ compare64_and_branch(Z_R10, 0x0, Assembler::bcondEqual, skip);
+//
+  //__ z_sllg(Z_R0, Z_R10, 3);
+  //__ z_sgr(Z_ARG1, Z_R0);
+  //__ z_sgr(Z_ARG2, Z_R0);
+//
+  //__ bind(check);
+  //__ z_lg(Z_R0, Address(Z_ARG1));
+  //__ z_lg(Z_R1, Address(Z_ARG2));
+  //__ compare64_and_branch(Z_R0, Z_R1, Assembler::bcondEqual, ok);
+  //__ stop("not equal");
+  //__ bind(ok);
+  //__ add2reg(Z_ARG1, 8);
+  //__ add2reg(Z_ARG2, 8);
+  //__ z_brct(Z_R10, check);
+  //__ bind(skip);
+//
 
   int offset = 8;
   __ restore_return_pc();                             offset += 8;
@@ -642,8 +647,8 @@ void ZBarrierSetAssembler::generate_conjoint_oop_copy(MacroAssembler* masm, bool
   const Register zpointer = Z_R1;
   const VectorRegister Vdata = Z_V0;
 
-  __ load_const_optimized(Z_R1, (uintptr_t)&conjoint_fubar);
-  __ z_agsi(0, Z_R1, 1);
+  //__ load_const_optimized(Z_R1, (uintptr_t)&conjoint_fubar);
+  //__ z_agsi(0, Z_R1, 1);
 
   Label done;
   __ z_slag(Z_R0, Z_ARG3, 3);
@@ -674,8 +679,8 @@ void ZBarrierSetAssembler::generate_conjoint_oop_copy(MacroAssembler* masm, bool
 
   __ bind(done);
 
-  __ load_const_optimized(Z_R1, (uintptr_t)&conjoint_end_fubar);
-  __ z_agsi(0, Z_R1, 1);
+  //__ load_const_optimized(Z_R1, (uintptr_t)&conjoint_end_fubar);
+  //__ z_agsi(0, Z_R1, 1);
 
   int offset = 8;
   __ restore_return_pc();                             offset += 8;
