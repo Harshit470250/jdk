@@ -658,24 +658,6 @@ void ZBarrierSetAssembler::generate_disjoint_oop_copy(MacroAssembler* masm, bool
   //__ bind(skip);
 //
 
-  //Label check, ok, skip;
-  //__ compare64_and_branch(Z_R10, 0x0, Assembler::bcondEqual, skip);
-//
-  //__ z_sllg(Z_R0, Z_R10, 3);
-  //__ z_sgr(Z_ARG1, Z_R0);
-  //__ z_sgr(Z_ARG2, Z_R0);
-//
-  //__ bind(check);
-  //__ z_lg(Z_R0, Address(Z_ARG1));
-  //__ z_lg(Z_R1, Address(Z_ARG2));
-  //__ compare64_and_branch(Z_R0, Z_R1, Assembler::bcondEqual, ok);
-  //__ stop("not equal");
-  //__ bind(ok);
-  //__ add2reg(Z_ARG1, 8);
-  //__ add2reg(Z_ARG2, 8);
-  //__ z_brct(Z_R10, check);
-  //__ bind(skip);
-//
   __ restore_return_pc();
   __ z_lmg(Z_R5, Z_R11, 16, Z_SP);
   __ pop_frame();
