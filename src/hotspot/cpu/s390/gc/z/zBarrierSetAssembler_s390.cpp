@@ -537,6 +537,10 @@ void ZBarrierSetAssembler::copy_load_at_vec(MacroAssembler* masm, VectorRegister
   __ z_vlvgg(Vdata, zpointer, 1);
 
   __ bind(done);
+
+  // Clear color bits in Vdata
+  __ z_vgbm(Vscratch, 0xfcfc);
+  __ z_vn(Vdata, Vdata, Vscratch);
 }
 
 void ZBarrierSetAssembler::copy_store_at_vec(MacroAssembler* masm, VectorRegister Vdata, Register zpointer,
@@ -552,6 +556,9 @@ void ZBarrierSetAssembler::copy_store_at_vec(MacroAssembler* masm, VectorRegiste
     __ z_vtm(Vscratch, Vscratch);
     // TODO: Check Why bcondVAlltrue is not working
     __ branch_optimized(Assembler::bcondAllOne, fallback);
+  } else {
+    //__ load_const_optimized(Z_tmp_1, (uintptr_t)&fubar);
+    //__ z_agsi(0, Z_tmp_1, 1);
   }
 
   __ z_vo(Vdata, Vdata, _vec_store_good);
@@ -654,6 +661,8 @@ void ZBarrierSetAssembler::generate_disjoint_oop_copy(MacroAssembler* masm, bool
   __ z_lg(Z_R5, offset, Z_SP);                        offset += 8;
   __ z_lg(Z_R6, offset, Z_SP);                        offset += 8;
   __ z_lg(Z_R7, offset, Z_SP);                        offset += 8;
+  __ z_lg(Z_R8, offset, Z_SP);                        offset += 8;
+  __ z_lg(Z_R9, offset, Z_SP);                        offset += 8;
   __ z_lg(Z_R10, offset, Z_SP);                       offset += 8;
   __ z_lg(Z_R11, offset, Z_SP);
   __ pop_frame();
@@ -706,6 +715,8 @@ void ZBarrierSetAssembler::generate_conjoint_oop_copy(MacroAssembler* masm, bool
   __ z_lg(Z_R5, offset, Z_SP);                        offset += 8;
   __ z_lg(Z_R6, offset, Z_SP);                        offset += 8;
   __ z_lg(Z_R7, offset, Z_SP);                        offset += 8;
+  __ z_lg(Z_R8, offset, Z_SP);                        offset += 8;
+  __ z_lg(Z_R9, offset, Z_SP);                        offset += 8;
   __ z_lg(Z_R10, offset, Z_SP);                       offset += 8;
   __ z_lg(Z_R11, offset, Z_SP);
   __ pop_frame();
@@ -732,13 +743,15 @@ void ZBarrierSetAssembler::arraycopy_prologue(MacroAssembler* masm,
 //  __ load_const_optimized(Z_R1, (uintptr_t)&prolog_fubar);
 //  __ z_agsi(0, Z_R1, 1);
 
-  int nbytes_save = 7 * BytesPerWord;                 // SP, PC, R5, R6, R7, R10, R11
+  int nbytes_save = 9 * BytesPerWord;                 // SP, PC, R5, R6, R7, R10, R11
   int offset = 0;
   __ push_frame(nbytes_save);                         offset += 8;
   __ save_return_pc();                                offset += 8;
   __ z_stg(Z_R5, offset, Z_SP);                       offset += 8;
   __ z_stg(Z_R6, offset, Z_SP);                       offset += 8;
   __ z_stg(Z_R7, offset, Z_SP);                       offset += 8;
+  __ z_stg(Z_R8, offset, Z_SP);                       offset += 8;
+  __ z_stg(Z_R9, offset, Z_SP);                       offset += 8;
   __ z_stg(Z_R10, offset, Z_SP);                      offset += 8;
   __ z_stg(Z_R11, offset, Z_SP);
 
