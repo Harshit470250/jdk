@@ -83,6 +83,15 @@ public:
                             Label& slow_path,
                             Label& slow_path_continuation) const;
 
+  virtual void store_at(MacroAssembler* masm,
+                        DecoratorSet decorators,
+                        BasicType type,
+                        const Address& dst,
+                        Register src,
+                        Register temp1,
+                        Register temp2,
+                        Register temp3);
+
   void copy_load_at(MacroAssembler* masm, Register zpointer, Address src);
 
   void copy_store_at(MacroAssembler* masm, Register zpointer, Register dst,
