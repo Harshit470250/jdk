@@ -59,6 +59,10 @@ long fubar = 0;
 long prolog_fubar = 0;
 long store_fubar = 0;
 long add_fubar = 0;
+long idk_fubar = 0;
+long start_addr = 0;
+long end_addr = 0;
+long copy_count = 0;
 
 class ZRuntimeCallSpill {
 private:
@@ -596,8 +600,15 @@ void ZBarrierSetAssembler::generate_disjoint_oop_copy(MacroAssembler* masm, bool
   const Register zpointer = Z_R1;
   const VectorRegister Vdata = Z_V0;
 
-  __ load_const_optimized(Z_R1, (uintptr_t)&disjoint_fubar);
-  __ z_agsi(0, Z_R1, 1);
+//  __ load_const_optimized(Z_R1, (uintptr_t)&start_addr);
+//  __ z_stg(Z_ARG1, Address(Z_R1));
+//  __ load_const_optimized(Z_R1, (uintptr_t)&end_addr);
+//  __ z_stg(Z_ARG2, Address(Z_R1));
+//  __ load_const_optimized(Z_R1, (uintptr_t)&copy_count);
+//  __ z_stg(Z_ARG3, Address(Z_R1));
+
+  //__ load_const_optimized(Z_R1, (uintptr_t)&disjoint_fubar);
+  //__ z_agsi(0, Z_R1, 1);
 
   Label done;
   __ z_cghi(Z_ARG3, 0);
