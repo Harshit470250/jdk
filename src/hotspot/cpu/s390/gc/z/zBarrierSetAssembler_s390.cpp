@@ -420,14 +420,6 @@ void ZBarrierSetAssembler::copy_load_at(MacroAssembler* masm, Register zpointer,
     __ z_lay(Z_ARG2, src);
     __ z_lgr(Z_ARG1, zpointer);
     __ call_VM_leaf(ZBarrierSetRuntime::load_barrier_on_oop_field_preloaded_store_good_addr());
-
-  __ load_const(Z_R1, ExternalAddress((address)&ZPointerVectorLoadBadMask));
-  __ z_vl(_vec_load_bad, Address(Z_R1));
-  __ load_const(Z_R1, ExternalAddress((address)&ZPointerVectorStoreBadMask));
-  __ z_vl(_vec_store_bad, Address(Z_R1));
-  __ load_const(Z_R1, ExternalAddress((address)&ZPointerVectorStoreGoodMask));
-  __ z_vl(_vec_store_good, Address(Z_R1));
-
   }
 
   __ z_vrepg(_vec_load_bad, _vec_load_bad, 0);
@@ -435,9 +427,6 @@ void ZBarrierSetAssembler::copy_load_at(MacroAssembler* masm, Register zpointer,
   __ z_vrepg(_vec_store_good, _vec_store_good, 0);
 
   __ bind(load_done);
-
-  //__ load_const_optimized(Z_R9, (uintptr_t)&fubar);
-  //__ z_agsi(0, Z_R9, 1);
 
   // Remove color so that store side (vectorized or non-vectorized) can inject
   // the sotore-good color with an or instruction
@@ -452,36 +441,20 @@ void ZBarrierSetAssembler::copy_store_at(MacroAssembler* masm, Register zpointer
     __ z_ngrk(Z_R0_scratch, Z_R0_scratch, _store_bad_mask);
     __ branch_optimized(Assembler::bcondZero, store);
 
-    //__ load_const_optimized(Z_tmp_1, (uintptr_t)&add_fubar);
-    //__ z_agsi(0, Z_tmp_1, 1);
-
     store_barrier_buffer_add(masm, Address(dst), Z_tmp_1, Z_tmp_2, store_bad);
     __ branch_optimized(Assembler::bcondAlways, store);
 
     __ bind(store_bad);
-    //__ load_const_optimized(Z_tmp_1, (uintptr_t)&store_fubar);
-    //__ z_agsi(0, Z_tmp_1, 1);
-
     {
       // Call VM
       ZRuntimeCallSpill rcs(masm, noreg);
       __ z_lgr(Z_ARG1, dst);
       __ call_VM_leaf(ZBarrierSetRuntime::store_barrier_on_oop_field_without_healing_addr());
-
-  __ load_const(Z_R1, ExternalAddress((address)&ZPointerVectorLoadBadMask));
-  __ z_vl(_vec_load_bad, Address(Z_R1));
-  __ load_const(Z_R1, ExternalAddress((address)&ZPointerVectorStoreBadMask));
-  __ z_vl(_vec_store_bad, Address(Z_R1));
-  __ load_const(Z_R1, ExternalAddress((address)&ZPointerVectorStoreGoodMask));
-  __ z_vl(_vec_store_good, Address(Z_R1));
-
-
     }
 
-  __ z_vrepg(_vec_load_bad, _vec_load_bad, 0);
-  __ z_vrepg(_vec_store_bad, _vec_store_bad, 0);
-  __ z_vrepg(_vec_store_good, _vec_store_good, 0);
-
+    __ z_vrepg(_vec_load_bad, _vec_load_bad, 0);
+    __ z_vrepg(_vec_store_bad, _vec_store_bad, 0);
+    __ z_vrepg(_vec_store_good, _vec_store_good, 0);
 
     __ bind(store);
   }
@@ -501,10 +474,8 @@ void ZBarrierSetAssembler::copy_load_at_vec(MacroAssembler* masm, VectorRegister
   __ z_vn(Vscratch, Vdata, _vec_load_bad);
   __ z_vtm(Vscratch, Vscratch);
   // TODO: What is wrong with bcondVAllFalse
-  __ branch_optimized(Assembler::bcondZero, done);
+  __ branch_optimized(Assembler::bcondVAlltrue, done);
 
-  //__ load_const_optimized(Z_R9, (uintptr_t)&fubar);
-  //__ z_agsi(0, Z_R9, 1);
   copy_load_at(masm, zpointer, Address(src, 0));
   __ z_vlvgg(Vdata, zpointer, 0);
   copy_load_at(masm, zpointer, Address(src, 8));
@@ -523,16 +494,11 @@ void ZBarrierSetAssembler::copy_store_at_vec(MacroAssembler* masm, VectorRegiste
   Label fallback, done;
 
   if (!dest_uninitialized) {
-    //__ load_const_optimized(Z_tmp_1, (uintptr_t)&fubar);
-    //__ z_agsi(0, Z_tmp_1, 1);
     __ z_vl(Vscratch, Address(dst));
     __ z_vn(Vscratch, Vscratch, _vec_store_bad);
     __ z_vtm(Vscratch, Vscratch);
     // TODO: Check Why bcondVAlltrue is not working
-    __ branch_optimized(Assembler::bcondAllOne, fallback);
-  } else {
-    //__ load_const_optimized(Z_tmp_1, (uintptr_t)&fubar);
-    //__ z_agsi(0, Z_tmp_1, 1);
+    __ branch_optimized(Assembler::bcondVAllfalse, fallback);
   }
 
   __ z_vo(Vdata, Vdata, _vec_store_good);
@@ -541,7 +507,6 @@ void ZBarrierSetAssembler::copy_store_at_vec(MacroAssembler* masm, VectorRegiste
 
   __ bind(fallback);
 
-  //__ stop("store at vec slow");
   // Loads upper 64 bits of Vdata into zpointer
   // We need to save Vdata here
   __ z_vlgvg(zpointer, Vdata, 0, Z_R1);
@@ -561,7 +526,6 @@ void ZBarrierSetAssembler::copy_store_at_vec(MacroAssembler* masm, VectorRegiste
 //      from:  Z_ARG1
 //      to:    Z_ARG2
 //      count: Z_ARG3 (int >= 0)
-// TODO: Use vector instructions
 // copy_load_at_vec -> load 2 oops from ARG1 and check color and store in Z_V0
 // copy_store_at_vec -> check color of 2 oops at ARG2 and store Z_V0 into ARG2
 // copy_load_at -> load 1 oop from ARG1 and check color and load it in R1
@@ -571,16 +535,6 @@ void ZBarrierSetAssembler::generate_disjoint_oop_copy(MacroAssembler* masm, bool
 // TODO check is_reference_type(type) here
   const Register zpointer = Z_R1;
   const VectorRegister Vdata = Z_V0;
-
-//  __ load_const_optimized(Z_R1, (uintptr_t)&start_addr);
-//  __ z_stg(Z_ARG1, Address(Z_R1));
-//  __ load_const_optimized(Z_R1, (uintptr_t)&end_addr);
-//  __ z_stg(Z_ARG2, Address(Z_R1));
-//  __ load_const_optimized(Z_R1, (uintptr_t)&copy_count);
-//  __ z_stg(Z_ARG3, Address(Z_R1));
-
-  //__ load_const_optimized(Z_R1, (uintptr_t)&disjoint_fubar);
-  //__ z_agsi(0, Z_R1, 1);
 
   Label done;
   __ z_cghi(Z_ARG3, 0);
@@ -608,27 +562,6 @@ void ZBarrierSetAssembler::generate_disjoint_oop_copy(MacroAssembler* masm, bool
   __ add2reg(Z_ARG3, -1);
 
   __ bind(done);
-  //__ load_const_optimized(Z_R1, (uintptr_t)&disjoint_end_fubar);
-  //__ z_agsi(0, Z_R1, 1);
-
-  //Label check, ok, skip;
-  //__ compare64_and_branch(Z_R10, 0x0, Assembler::bcondEqual, skip);
-//
-  //__ z_sllg(Z_R0, Z_R10, 3);
-  //__ z_sgr(Z_ARG1, Z_R0);
-  //__ z_sgr(Z_ARG2, Z_R0);
-//
-  //__ bind(check);
-  //__ z_lg(Z_R0, Address(Z_ARG1));
-  //__ z_lg(Z_R1, Address(Z_ARG2));
-  //__ compare64_and_branch(Z_R0, Z_R1, Assembler::bcondEqual, ok);
-  //__ stop("not equal");
-  //__ bind(ok);
-  //__ add2reg(Z_ARG1, 8);
-  //__ add2reg(Z_ARG2, 8);
-  //__ z_brct(Z_R10, check);
-  //__ bind(skip);
-//
 
   __ restore_return_pc();
   __ z_lmg(Z_R5, Z_R11, 16, Z_SP);
@@ -641,9 +574,6 @@ void ZBarrierSetAssembler::generate_disjoint_oop_copy(MacroAssembler* masm, bool
 void ZBarrierSetAssembler::generate_conjoint_oop_copy(MacroAssembler* masm, bool dest_uninitialized) {
   const Register zpointer = Z_R1;
   const VectorRegister Vdata = Z_V0;
-
-//  __ load_const_optimized(Z_R1, (uintptr_t)&conjoint_fubar);
-//  __ z_agsi(0, Z_R1, 1);
 
   Label done;
   __ z_slag(Z_R0, Z_ARG3, 3);
