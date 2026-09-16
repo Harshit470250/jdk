@@ -1261,7 +1261,6 @@ class StubGenerator: public StubCodeGenerator {
         __ z_sthy(data_reg, -2, ix_reg, dst_reg);
         __ add2reg(ix_reg, -2); // Decrement delayed to avoid AGI.
         __ bind(skipHW);
-        // TODO: why are we not checking this in next if condition?
         __ z_tmll(ix_reg, 4);
         __ z_bre(vec_count);
         // fallthru
