@@ -422,6 +422,8 @@ void ZBarrierSetAssembler::copy_load_at(MacroAssembler* masm, Register zpointer,
     __ call_VM_leaf(ZBarrierSetRuntime::load_barrier_on_oop_field_preloaded_store_good_addr());
   }
 
+  // Restoring float registers corrupts the lower 64 bits of the corresponding vector register
+  // Restore these values
   __ z_vrepg(_vec_load_bad, _vec_load_bad, 0);
   __ z_vrepg(_vec_store_bad, _vec_store_bad, 0);
   __ z_vrepg(_vec_store_good, _vec_store_good, 0);
@@ -452,6 +454,8 @@ void ZBarrierSetAssembler::copy_store_at(MacroAssembler* masm, Register zpointer
       __ call_VM_leaf(ZBarrierSetRuntime::store_barrier_on_oop_field_without_healing_addr());
     }
 
+   // Restoring float registers corrupts the lower 64 bits of the corresponding vector register
+   // Restore these values
     __ z_vrepg(_vec_load_bad, _vec_load_bad, 0);
     __ z_vrepg(_vec_store_bad, _vec_store_bad, 0);
     __ z_vrepg(_vec_store_good, _vec_store_good, 0);
@@ -482,7 +486,6 @@ void ZBarrierSetAssembler::copy_load_at_vec(MacroAssembler* masm, VectorRegister
   __ z_vlvgg(Vdata, zpointer, 1);
 
   __ bind(done);
-
   // Clear color bits in Vdata
   __ z_vgbm(Vscratch, 0xfcfc);
   __ z_vn(Vdata, Vdata, Vscratch);
@@ -510,11 +513,9 @@ void ZBarrierSetAssembler::copy_store_at_vec(MacroAssembler* masm, VectorRegiste
   // Loads upper 64 bits of Vdata into zpointer
   // We need to save Vdata here
   __ z_vlgvg(zpointer, Vdata, 0, Z_R1);
-  __ z_vlgvg(Z_R9, Vdata, 1, Z_R1);
   copy_store_at(masm, zpointer, dst, dest_uninitialized);
   // Loads lower 64 bits of Vdata into zpointer
-  //__ z_vlgvg(zpointer, Vdata, 1, Z_R1);
-  __ z_lgr(zpointer, Z_R9);
+  __ z_vlgvg(zpointer, Vdata, 1, Z_R1);
   __ add2reg(dst, 8);
   copy_store_at(masm, zpointer, dst, dest_uninitialized);
   __ add2reg(dst, -8);
