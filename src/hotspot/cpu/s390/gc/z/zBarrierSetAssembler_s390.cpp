@@ -477,7 +477,7 @@ void ZBarrierSetAssembler::copy_load_at(MacroAssembler* masm, VectorRegister Vda
   __ z_vl(Vdata, Address(src));
   __ z_vn(Vscratch, Vdata, _vec_load_bad);
   __ z_vtm(Vscratch, Vscratch);
-  __ branch_optimized(Assembler::bcondVAlltrue, done);
+  __ branch_optimized(Assembler::bcondZero, done);
 
   copy_load_at(masm, zpointer, Address(src, 0));
   __ z_vlvgg(Vdata, zpointer, 0);
@@ -499,7 +499,7 @@ void ZBarrierSetAssembler::copy_store_at(MacroAssembler* masm, VectorRegister Vd
     __ z_vl(Vscratch, Address(dst));
     __ z_vn(Vscratch, Vscratch, _vec_store_bad);
     __ z_vtm(Vscratch, Vscratch);
-    __ branch_optimized(Assembler::bcondVAllfalse, fallback);
+    __ branch_optimized(Assembler::bcondNotZero, fallback);
   }
 
   __ z_vo(Vdata, Vdata, _vec_store_good);
@@ -545,7 +545,7 @@ void ZBarrierSetAssembler::generate_disjoint_oop_copy(MacroAssembler* masm, bool
   __ bind(tail);
   // scalar copy
   copy_load_at(masm, zpointer, Address(Z_ARG1));
-  copy_store_at(masm, zpointer, Z_ARG2, dest_uninitialized);
+  copy_store_at(masm, zpointer, Address(Z_ARG2), dest_uninitialized);
   __ add2reg(Z_ARG1, 8);
   __ add2reg(Z_ARG2, 8);
   __ add2reg(Z_ARG3, -1);
@@ -589,7 +589,7 @@ void ZBarrierSetAssembler::generate_conjoint_oop_copy(MacroAssembler* masm, bool
   __ add2reg(Z_ARG2, -8);
   // scalar copy
   copy_load_at(masm, zpointer, Address(Z_ARG1));
-  copy_store_at(masm, zpointer, Z_ARG2, dest_uninitialized);
+  copy_store_at(masm, zpointer, Address(Z_ARG2), dest_uninitialized);
 
   __ bind(done);
 
