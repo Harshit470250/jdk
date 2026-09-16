@@ -97,10 +97,10 @@ public:
   void copy_store_at(MacroAssembler* masm, Register zpointer, Address dst,
                      bool dest_uninitialized);
 
-  void copy_load_at_vec(MacroAssembler* masm, VectorRegister Vdata, Register zpointer,
+  void copy_load_at(MacroAssembler* masm, VectorRegister Vdata, Register zpointer,
                         Register src);
 
-  void copy_store_at_vec(MacroAssembler* masm, VectorRegister Vdata, Register zpointer,
+  void copy_store_at(MacroAssembler* masm, VectorRegister Vdata, Register zpointer,
                          Register dst, bool dest_uninitialized);
 
   void generate_disjoint_oop_copy(MacroAssembler* masm, bool dest_uninitialized);

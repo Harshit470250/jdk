@@ -469,7 +469,7 @@ void ZBarrierSetAssembler::copy_store_at(MacroAssembler* masm, Register zpointer
   __ z_stg(zpointer, dst);
 }
 
-void ZBarrierSetAssembler::copy_load_at_vec(MacroAssembler* masm, VectorRegister Vdata, Register zpointer,
+void ZBarrierSetAssembler::copy_load_at(MacroAssembler* masm, VectorRegister Vdata, Register zpointer,
                       Register src) {
   VectorRegister Vscratch = Z_V1;
   Label done;
@@ -477,7 +477,6 @@ void ZBarrierSetAssembler::copy_load_at_vec(MacroAssembler* masm, VectorRegister
   __ z_vl(Vdata, Address(src));
   __ z_vn(Vscratch, Vdata, _vec_load_bad);
   __ z_vtm(Vscratch, Vscratch);
-  // TODO: What is wrong with bcondVAllFalse
   __ branch_optimized(Assembler::bcondVAlltrue, done);
 
   copy_load_at(masm, zpointer, Address(src, 0));
@@ -491,7 +490,7 @@ void ZBarrierSetAssembler::copy_load_at_vec(MacroAssembler* masm, VectorRegister
   __ z_vn(Vdata, Vdata, Vscratch);
 }
 
-void ZBarrierSetAssembler::copy_store_at_vec(MacroAssembler* masm, VectorRegister Vdata, Register zpointer,
+void ZBarrierSetAssembler::copy_store_at(MacroAssembler* masm, VectorRegister Vdata, Register zpointer,
                        Register dst, bool dest_uninitialized) {
   VectorRegister Vscratch = Z_V1;
   Label fallback, done;
@@ -500,7 +499,6 @@ void ZBarrierSetAssembler::copy_store_at_vec(MacroAssembler* masm, VectorRegiste
     __ z_vl(Vscratch, Address(dst));
     __ z_vn(Vscratch, Vscratch, _vec_store_bad);
     __ z_vtm(Vscratch, Vscratch);
-    // TODO: Check Why bcondVAlltrue is not working
     __ branch_optimized(Assembler::bcondVAllfalse, fallback);
   }
 
@@ -525,26 +523,19 @@ void ZBarrierSetAssembler::copy_store_at_vec(MacroAssembler* masm, VectorRegiste
 //      from:  Z_ARG1
 //      to:    Z_ARG2
 //      count: Z_ARG3 (int >= 0)
-// copy_load_at_vec -> load 2 oops from ARG1 and check color and store in Z_V0
-// copy_store_at_vec -> check color of 2 oops at ARG2 and store Z_V0 into ARG2
-// copy_load_at -> load 1 oop from ARG1 and check color and load it in R1
-// copy_store_at -> check color of ARG2 and store R1 in ARG2
-// generate_*joint_copy -> will use subsequent coply_(load/store)_at to store 2 oops in Z_V0
 void ZBarrierSetAssembler::generate_disjoint_oop_copy(MacroAssembler* masm, bool dest_uninitialized) {
-// TODO check is_reference_type(type) here
   const Register zpointer = Z_R1;
   const VectorRegister Vdata = Z_V0;
 
   Label done;
-  __ z_cghi(Z_ARG3, 0);
-  __ z_bre(done);
+  __ compare64_and_branch(Z_ARG3, 0x0, Assembler::bcondEqual, done);
 
   Label tail, loop;
   __ compare64_and_branch(Z_ARG3, 0x2, Assembler::bcondLow, tail);
 
   __ bind(loop);
-  copy_load_at_vec(masm, Vdata, zpointer, Z_ARG1);
-  copy_store_at_vec(masm, Vdata, zpointer, Z_ARG2, dest_uninitialized);
+  copy_load_at(masm, Vdata, zpointer, Z_ARG1);
+  copy_store_at(masm, Vdata, zpointer, Z_ARG2, dest_uninitialized);
   __ add2reg(Z_ARG1, 16);
   __ add2reg(Z_ARG2, 16);
   __ add2reg(Z_ARG3, -2);
@@ -552,6 +543,7 @@ void ZBarrierSetAssembler::generate_disjoint_oop_copy(MacroAssembler* masm, bool
   __ compare64_and_branch(Z_ARG3, 0x0, Assembler::bcondEqual, done);
 
   __ bind(tail);
+  // scalar copy
   copy_load_at(masm, zpointer, Address(Z_ARG1));
   copy_store_at(masm, zpointer, Z_ARG2, dest_uninitialized);
   __ add2reg(Z_ARG1, 8);
@@ -586,8 +578,8 @@ void ZBarrierSetAssembler::generate_conjoint_oop_copy(MacroAssembler* masm, bool
   __ bind(loop);
   __ add2reg(Z_ARG1, -16);
   __ add2reg(Z_ARG2, -16);
-  copy_load_at_vec(masm, Vdata, zpointer, Z_ARG1);
-  copy_store_at_vec(masm, Vdata, zpointer, Z_ARG2, dest_uninitialized);
+  copy_load_at(masm, Vdata, zpointer, Z_ARG1);
+  copy_store_at(masm, Vdata, zpointer, Z_ARG2, dest_uninitialized);
   __ add2reg(Z_ARG3, -2);
   __ compare64_and_branch(Z_ARG3, 0x2, Assembler::bcondNotLow, loop);
   __ compare64_and_branch(Z_ARG3, 0x0, Assembler::bcondEqual, done);
@@ -595,6 +587,7 @@ void ZBarrierSetAssembler::generate_conjoint_oop_copy(MacroAssembler* masm, bool
   __ bind(tail);
   __ add2reg(Z_ARG1, -8);
   __ add2reg(Z_ARG2, -8);
+  // scalar copy
   copy_load_at(masm, zpointer, Address(Z_ARG1));
   copy_store_at(masm, zpointer, Z_ARG2, dest_uninitialized);
 
@@ -649,8 +642,10 @@ void ZBarrierSetAssembler::load_copy_masks(MacroAssembler* masm,
 
   __ load_const(Z_R1, ExternalAddress((address)&ZPointerVectorLoadBadMask));
   __ z_vl(_vec_load_bad, Address(Z_R1));
-  __ load_const(Z_R1, ExternalAddress((address)&ZPointerVectorStoreBadMask));
-  __ z_vl(_vec_store_bad, Address(Z_R1));
+  if (!dest_uninitialized) {
+    __ load_const(Z_R1, ExternalAddress((address)&ZPointerVectorStoreBadMask));
+    __ z_vl(_vec_store_bad, Address(Z_R1));
+  }
   __ load_const(Z_R1, ExternalAddress((address)&ZPointerVectorStoreGoodMask));
   __ z_vl(_vec_store_good, Address(Z_R1));
 }
