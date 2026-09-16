@@ -550,11 +550,9 @@ void ZBarrierSetAssembler::generate_disjoint_oop_copy(MacroAssembler* masm, bool
   __ add2reg(Z_ARG2, 16);
   __ add2reg(Z_ARG3, -2);
   __ compare64_and_branch(Z_ARG3, 0x2, Assembler::bcondNotLow, loop);
+  __ compare64_and_branch(Z_ARG3, 0x0, Assembler::bcondEqual, done);
 
   __ bind(tail);
-  __ z_cghi(Z_ARG3, 0);
-  __ z_bre(done);
-
   copy_load_at(masm, zpointer, Address(Z_ARG1));
   copy_store_at(masm, zpointer, Z_ARG2, dest_uninitialized);
   __ add2reg(Z_ARG1, 8);
@@ -593,10 +591,9 @@ void ZBarrierSetAssembler::generate_conjoint_oop_copy(MacroAssembler* masm, bool
   copy_store_at_vec(masm, Vdata, zpointer, Z_ARG2, dest_uninitialized);
   __ add2reg(Z_ARG3, -2);
   __ compare64_and_branch(Z_ARG3, 0x2, Assembler::bcondNotLow, loop);
+  __ compare64_and_branch(Z_ARG3, 0x0, Assembler::bcondEqual, done);
 
   __ bind(tail);
-  __ z_cghi(Z_ARG3, 0);
-  __ branch_optimized(Assembler::bcondEqual, done);
   __ add2reg(Z_ARG1, -8);
   __ add2reg(Z_ARG2, -8);
   copy_load_at(masm, zpointer, Address(Z_ARG1));
