@@ -435,22 +435,22 @@ void ZBarrierSetAssembler::copy_load_at(MacroAssembler* masm, Register zpointer,
   __ z_nill(zpointer, 0x0);
 }
 
-void ZBarrierSetAssembler::copy_store_at(MacroAssembler* masm, Register zpointer, Register dst,
+void ZBarrierSetAssembler::copy_store_at(MacroAssembler* masm, Register zpointer, Address dst,
                    bool dest_uninitialized) {
   if (!dest_uninitialized) {
     Label store, store_bad, dummy;
-    __ z_lg(Z_R0_scratch, Address(dst));
+    __ z_lg(Z_R0_scratch, dst);
     __ z_ngrk(Z_R0_scratch, Z_R0_scratch, _store_bad_mask);
     __ branch_optimized(Assembler::bcondZero, store);
 
-    store_barrier_buffer_add(masm, Address(dst), Z_tmp_1, Z_tmp_2, store_bad);
+    store_barrier_buffer_add(masm, dst, Z_tmp_1, Z_tmp_2, store_bad);
     __ branch_optimized(Assembler::bcondAlways, store);
 
     __ bind(store_bad);
     {
       // Call VM
       ZRuntimeCallSpill rcs(masm, noreg);
-      __ z_lgr(Z_ARG1, dst);
+      __ z_lay(Z_ARG1, dst);
       __ call_VM_leaf(ZBarrierSetRuntime::store_barrier_on_oop_field_without_healing_addr());
     }
 
@@ -466,7 +466,7 @@ void ZBarrierSetAssembler::copy_store_at(MacroAssembler* masm, Register zpointer
   // Color
   __ z_nill(zpointer, 0x0);
   __ z_ogr(zpointer, _store_good_mask);
-  __ z_stg(zpointer, Address(dst));
+  __ z_stg(zpointer, dst);
 }
 
 void ZBarrierSetAssembler::copy_load_at_vec(MacroAssembler* masm, VectorRegister Vdata, Register zpointer,
@@ -513,12 +513,10 @@ void ZBarrierSetAssembler::copy_store_at_vec(MacroAssembler* masm, VectorRegiste
   // Loads upper 64 bits of Vdata into zpointer
   // We need to save Vdata here
   __ z_vlgvg(zpointer, Vdata, 0, Z_R1);
-  copy_store_at(masm, zpointer, dst, dest_uninitialized);
+  copy_store_at(masm, zpointer, Address(dst, 0), dest_uninitialized);
   // Loads lower 64 bits of Vdata into zpointer
   __ z_vlgvg(zpointer, Vdata, 1, Z_R1);
-  __ add2reg(dst, 8);
-  copy_store_at(masm, zpointer, dst, dest_uninitialized);
-  __ add2reg(dst, -8);
+  copy_store_at(masm, zpointer, Address(dst, 8), dest_uninitialized);
 
   __ bind(done);
 }

@@ -94,7 +94,7 @@ public:
 
   void copy_load_at(MacroAssembler* masm, Register zpointer, Address src);
 
-  void copy_store_at(MacroAssembler* masm, Register zpointer, Register dst,
+  void copy_store_at(MacroAssembler* masm, Register zpointer, Address dst,
                      bool dest_uninitialized);
 
   void copy_load_at_vec(MacroAssembler* masm, VectorRegister Vdata, Register zpointer,
