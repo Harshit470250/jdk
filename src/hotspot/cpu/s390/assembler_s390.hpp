@@ -1295,13 +1295,16 @@ class Assembler : public AbstractAssembler {
 #define VSTRC_ZOPC  (unsigned long)(0xe7L << 40 | 0x8aL << 0)   // String range compare
 #define VISTR_ZOPC  (unsigned long)(0xe7L << 40 | 0x5cL << 0)   // Isolate String
 
-#define VFA_ZOPC   (unsigned long)(0xe7L << 40 | 0xE3L << 0)    // V1 := V2 + V3, element size = 2**m
-#define VFS_ZOPC   (unsigned long)(0xe7L << 40 | 0xE2L << 0)    // V1 := V2 - V3, element size = 2**m
-#define VFM_ZOPC   (unsigned long)(0xe7L << 40 | 0xE7L << 0)    // V1 := V2 * V3, element size = 2**m
-#define VFD_ZOPC   (unsigned long)(0xe7L << 40 | 0xE5L << 0)    // V1 := V2 / V3, element size = 2**m
-#define VFSQ_ZOPC  (unsigned long)(0xe7L << 40 | 0xCEL << 0)    // V1 := sqrt of V2, element size = 2**m
-#define VFLR_ZOPC  (unsigned long)(0xe7L << 40 | 0xC5L << 0)    // vector fp load rounded, element size = 2**m
+#define VFA_ZOPC    (unsigned long)(0xe7L << 40 | 0xE3L << 0)   // V1 := V2 + V3, element size = 2**m
+#define VFS_ZOPC    (unsigned long)(0xe7L << 40 | 0xE2L << 0)   // V1 := V2 - V3, element size = 2**m
+#define VFM_ZOPC    (unsigned long)(0xe7L << 40 | 0xE7L << 0)   // V1 := V2 * V3, element size = 2**m
+#define VFD_ZOPC    (unsigned long)(0xe7L << 40 | 0xE5L << 0)   // V1 := V2 / V3, element size = 2**m
+#define VFSQ_ZOPC   (unsigned long)(0xe7L << 40 | 0xCEL << 0)   // V1 := sqrt of V2, element size = 2**m
+#define VFLR_ZOPC   (unsigned long)(0xe7L << 40 | 0xC5L << 0)   // vector fp load rounded, element size = 2**m
 
+// Sign Operation
+#define VFPSO_ZOPC  (unsigned long)(0xe7L << 40 | 0xCCL << 0)   // V1 := sign_op(V2), element size = 2**m3,
+                                                                // m5 = 0:complement 1:negative 2:positive
 
 //--------------------------------
 //--  Miscellaneous Operations  --
@@ -2960,6 +2963,20 @@ class Assembler : public AbstractAssembler {
   //vector fp load rounded
   inline void z_vflr(  VectorRegister v1, VectorRegister v2, int64_t m3, int64_t m5);
   inline void z_vflrd( VectorRegister v1, VectorRegister v2, int64_t m5);
+
+  // sign operations
+  inline void z_vfpso(  VectorRegister v1, VectorRegister v2, int64_t m3, int64_t m5);
+  inline void z_vfpsosb(VectorRegister v1, VectorRegister v2, int64_t m5);    // float
+  inline void z_vfpsodb(VectorRegister v1, VectorRegister v2, int64_t m5);    // double
+  // Complement
+  inline void z_vflcsb( VectorRegister v1, VectorRegister v2);
+  inline void z_vflcdb( VectorRegister v1, VectorRegister v2);
+  // Negative
+  inline void z_vflnsb( VectorRegister v1, VectorRegister v2);
+  inline void z_vflndb( VectorRegister v1, VectorRegister v2);
+  // Positive
+  inline void z_vflpsb( VectorRegister v1, VectorRegister v2);
+  inline void z_vflpdb( VectorRegister v1, VectorRegister v2);
 
   // Floatingpoint instructions
   // ==========================
