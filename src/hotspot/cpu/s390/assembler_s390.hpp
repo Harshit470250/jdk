@@ -1306,6 +1306,10 @@ class Assembler : public AbstractAssembler {
 #define VFPSO_ZOPC  (unsigned long)(0xe7L << 40 | 0xCCL << 0)   // V1 := sign_op(V2), element size = 2**m3,
                                                                 // m5 = 0:complement 1:negative 2:positive
 
+// Vector Floatingpoint Max/Min
+#define VFMAX_ZOPC  (unsigned long)(0xe7L << 40 | 0xefL << 0)
+#define VFMIN_ZOPC  (unsigned long)(0xe7L << 40 | 0xeeL << 0)
+
 //--------------------------------
 //--  Miscellaneous Operations  --
 //--------------------------------
@@ -2977,6 +2981,16 @@ class Assembler : public AbstractAssembler {
   // Positive
   inline void z_vflpsb( VectorRegister v1, VectorRegister v2);
   inline void z_vflpdb( VectorRegister v1, VectorRegister v2);
+
+  //Max
+  inline void z_vfmax(  VectorRegister v1, VectorRegister v2, VectorRegister v3, int64_t m4);
+  inline void z_vfmaxsb(VectorRegister v1, VectorRegister v2, VectorRegister v3);      // float
+  inline void z_vfmaxdb(VectorRegister v1, VectorRegister v2, VectorRegister v3);      // double
+
+  //Min
+  inline void z_vfmin(  VectorRegister v1, VectorRegister v2, VectorRegister v3, int64_t m4);
+  inline void z_vfminsb(VectorRegister v1, VectorRegister v2, VectorRegister v3);      // float
+  inline void z_vfmindb(VectorRegister v1, VectorRegister v2, VectorRegister v3);      // double
 
   // Floatingpoint instructions
   // ==========================
