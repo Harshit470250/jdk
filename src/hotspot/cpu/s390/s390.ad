@@ -11676,11 +11676,32 @@ instruct vabs4F_reg(vecX dst, vecX src) %{
   ins_pipe(pipe_class_dummy);
 %}
 
+// TODO : check the placement for this
 instruct vneg4F_reg(vecX dst, vecX src) %{
   match(Set dst (NegVF src));
   format %{ "VFLNSB $dst,$src\t// negate packed4F" %}
   ins_encode %{
     __ z_vflnsb($dst$$VectorRegister, $src$$VectorRegister);
+  %}
+  ins_pipe(pipe_class_dummy);
+%}
+
+// TODO : check the placement for this
+instruct vabs4D_reg(vecX dst, vecX src) %{
+  match(Set dst (AbsVD src));
+  format %{ "VFLPDB $dst,$src\t// abs packed4D" %}
+  ins_encode %{
+    __ z_vflpdb($dst$$VectorRegister, $src$$VectorRegister);
+  %}
+  ins_pipe(pipe_class_dummy);
+%}
+
+// TODO : check the placement for this
+instruct vneg4D_reg(vecX dst, vecX src) %{
+  match(Set dst (NegVD src));
+  format %{ "VFLNDB $dst,$src\t// negate packed4D" %}
+  ins_encode %{
+    __ z_vflndb($dst$$VectorRegister, $src$$VectorRegister);
   %}
   ins_pipe(pipe_class_dummy);
 %}
