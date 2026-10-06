@@ -11664,6 +11664,17 @@ instruct vsqrt2D_reg(vecX dst, vecX src) %{
   ins_pipe(pipe_class_dummy);
 %}
 
+// TODO : check the placement for this
+instruct vabs4F_reg(vecX dst, vecX src, iRegL temp) %{
+  match(Set dst (AbsVF src));
+  effect(TEMP temp);
+  format %{ "VFPSOSB $dst,$src\t// abs packed4F" %}
+  ins_encode %{
+    __ z_vflpsb($dst$$VectorRegister, $src$$VectorRegister);
+  %}
+  ins_pipe(pipe_class_dummy);
+%}
+
 // Vector Population Count Instructions
 
 instruct vpopcnt_reg(vecX dst, vecX src) %{
