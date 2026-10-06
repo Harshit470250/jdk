@@ -1746,6 +1746,11 @@ bool Matcher::match_rule_supported(int opcode) {
     case Op_PopCountL:
       // PopCount supported by H/W from z/Architecture G5 (z196) on.
       return (UsePopCountInstruction && VM_Version::has_PopCount());
+    // TODO: Find the correct conditions here
+    case Op_AbsVB:
+    case Op_AbsVS:
+    case Op_AbsVI:
+    case Op_AbsVL:
     case Op_AddVB:
     case Op_AddVS:
     case Op_AddVI:
@@ -1767,6 +1772,8 @@ bool Matcher::match_rule_supported(int opcode) {
     case Op_AddVF:
     case Op_AbsVF:
     case Op_NegVF:
+    case Op_AbsVD:
+    case Op_NegVD:
     case Op_SubVF:
     case Op_MulVF:
     case Op_DivVF:
@@ -11702,6 +11709,41 @@ instruct vneg4D_reg(vecX dst, vecX src) %{
   format %{ "VFLNDB $dst,$src\t// negate packed4D" %}
   ins_encode %{
     __ z_vflndb($dst$$VectorRegister, $src$$VectorRegister);
+  %}
+  ins_pipe(pipe_class_dummy);
+%}
+
+// TODO : check the placement for this
+instruct vabsB_reg(vecX dst, vecX src) %{
+  match(Set dst (AbsVB src));
+  ins_encode %{
+    __ z_vlpb($dst$$VectorRegister, $src$$VectorRegister);
+  %}
+  ins_pipe(pipe_class_dummy);
+%}
+
+// TODO : check the placement for this
+instruct vabsS_reg(vecX dst, vecX src) %{
+  match(Set dst (AbsVS src));
+  ins_encode %{
+    __ z_vlph($dst$$VectorRegister, $src$$VectorRegister);
+  %}
+  ins_pipe(pipe_class_dummy);
+%}
+
+// TODO : check the placement for this
+instruct vabsI_reg(vecX dst, vecX src) %{
+  match(Set dst (AbsVI src));
+  ins_encode %{
+    __ z_vlpf($dst$$VectorRegister, $src$$VectorRegister);
+  %}
+  ins_pipe(pipe_class_dummy);
+%}
+
+instruct vabsL_reg(vecX dst, vecX src) %{
+  match(Set dst (AbsVL src));
+  ins_encode %{
+    __ z_vlpg($dst$$VectorRegister, $src$$VectorRegister);
   %}
   ins_pipe(pipe_class_dummy);
 %}
