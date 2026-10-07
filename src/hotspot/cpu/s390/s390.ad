@@ -11834,6 +11834,68 @@ instruct vmin_reg(vecX dst, vecX src1, vecX src2) %{
   ins_pipe(pipe_class_dummy);
 %}
 
+instruct vmaxu_reg(vecX dst, vecX src1, vecX src2) %{
+  match(Set dst (UMaxV src1 src2));
+  format %{ "VMAXU  $dst,$src1,$src2\t// vector unsigned max" %}
+  ins_encode %{
+    BasicType bt = Matcher::vector_element_basic_type(this);
+    switch (bt) {
+      case T_BYTE:
+        __ z_vmxlb($dst$$VectorRegister, $src1$$VectorRegister, $src2$$VectorRegister);
+        break;
+      case T_SHORT:
+        __ z_vmxlh($dst$$VectorRegister, $src1$$VectorRegister, $src2$$VectorRegister);
+        break;
+      case T_INT:
+        __ z_vmxlf($dst$$VectorRegister, $src1$$VectorRegister, $src2$$VectorRegister);
+        break;
+      case T_LONG:
+        __ z_vmxlg($dst$$VectorRegister, $src1$$VectorRegister, $src2$$VectorRegister);
+        break;
+      default:
+        ShouldNotReachHere();
+    }
+  %}
+  ins_pipe(pipe_class_dummy);
+%}
+
+instruct vminu_reg(vecX dst, vecX src1, vecX src2) %{
+  match(Set dst (UMinV src1 src2));
+  format %{ "VMINU  $dst,$src1,$src2\t// vector unsigned max" %}
+  ins_encode %{
+    BasicType bt = Matcher::vector_element_basic_type(this);
+    switch (bt) {
+      case T_BYTE:
+        __ z_vmnlb($dst$$VectorRegister, $src1$$VectorRegister, $src2$$VectorRegister);
+        break;
+      case T_SHORT:
+        __ z_vmnlh($dst$$VectorRegister, $src1$$VectorRegister, $src2$$VectorRegister);
+        break;
+      case T_INT:
+        __ z_vmnlf($dst$$VectorRegister, $src1$$VectorRegister, $src2$$VectorRegister);
+        break;
+      case T_LONG:
+        __ z_vmnlg($dst$$VectorRegister, $src1$$VectorRegister, $src2$$VectorRegister);
+        break;
+      default:
+        ShouldNotReachHere();
+    }
+  %}
+  ins_pipe(pipe_class_dummy);
+%}
+
+//TODO: find correct place for it
+//TODO: put AndV into the match rule supported table
+instruct vand(vecX dst, vecX src1, vecX src2) %{
+  match(Set dst (AndV src1 src2));
+  size(6);
+  format %{ "VAND   $dst,$src1,$src2\t// and vectors" %}
+  ins_encode %{
+    __ z_vn($dst$$VectorRegister, $src1$$VectorRegister, $src2$$VectorRegister);
+  %}
+  ins_pipe(pipe_class_dummy);
+%}
+
 // Vector Population Count Instructions
 
 instruct vpopcnt_reg(vecX dst, vecX src) %{
