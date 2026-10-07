@@ -11896,6 +11896,26 @@ instruct vand(vecX dst, vecX src1, vecX src2) %{
   ins_pipe(pipe_class_dummy);
 %}
 
+instruct vor(vecX dst, vecX src1, vecX src2) %{
+  match(Set dst (OrV src1 src2));
+  size(6);
+  format %{ "VOR   $dst,$src1,$src2\t// or vectors" %}
+  ins_encode %{
+    __ z_vo($dst$$VectorRegister, $src1$$VectorRegister, $src2$$VectorRegister);
+  %}
+  ins_pipe(pipe_class_dummy);
+%}
+
+instruct vxor(vecX dst, vecX src1, vecX src2) %{
+  match(Set dst (XorV src1 src2));
+  size(6);
+  format %{ "VXOR   $dst,$src1,$src2\t// xor vectors" %}
+  ins_encode %{
+    __ z_vx($dst$$VectorRegister, $src1$$VectorRegister, $src2$$VectorRegister);
+  %}
+  ins_pipe(pipe_class_dummy);
+%}
+
 // Vector Population Count Instructions
 
 instruct vpopcnt_reg(vecX dst, vecX src) %{
