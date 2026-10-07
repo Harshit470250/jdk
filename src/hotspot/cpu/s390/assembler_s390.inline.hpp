@@ -1254,12 +1254,12 @@ inline void Assembler::z_vflpsb( VectorRegister v1, VectorRegister v2)          
 inline void Assembler::z_vflpdb( VectorRegister v1, VectorRegister v2)                                {z_vfpsodb(v1, v2, 2); }
 
 // Max
-inline void Assembler::z_vfmax(  VectorRegister v1, VectorRegister v2, VectorRegister v3, int64_t m4) {emit_48(VFMAX_ZOPC | vreg(v1, 8) | vreg(v2, 12) | vreg(v3, 16) | vesc_mask(m4, VRET_FW, VRET_QW, 32)); }
+inline void Assembler::z_vfmax(  VectorRegister v1, VectorRegister v2, VectorRegister v3, int64_t m4) {emit_48(VFMAX_ZOPC | vreg(v1, 8) | vreg(v2, 12) | vreg(v3, 16) | vesc_mask(1, 1, 1, 24) | vesc_mask(m4, VRET_FW, VRET_QW, 32)); }
 inline void Assembler::z_vfmaxsb(VectorRegister v1, VectorRegister v2, VectorRegister v3)             {z_vfmax(v1, v2, v3, VRET_FW); }
 inline void Assembler::z_vfmaxdb(VectorRegister v1, VectorRegister v2, VectorRegister v3)             {z_vfmax(v1, v2, v3, VRET_DW); }
 
 // Min
-inline void Assembler::z_vfmin(  VectorRegister v1, VectorRegister v2, VectorRegister v3, int64_t m4) {emit_48(VFMIN_ZOPC | vreg(v1, 8) | vreg(v2, 12) | vreg(v3, 16) | vesc_mask(m4, VRET_FW, VRET_QW, 32)); }
+inline void Assembler::z_vfmin(  VectorRegister v1, VectorRegister v2, VectorRegister v3, int64_t m4) {emit_48(VFMIN_ZOPC | vreg(v1, 8) | vreg(v2, 12) | vreg(v3, 16) | vesc_mask(1, 1, 1, 24) | vesc_mask(m4, VRET_FW, VRET_QW, 32)); }
 inline void Assembler::z_vfminsb(VectorRegister v1, VectorRegister v2, VectorRegister v3)             {z_vfmin(v1, v2, v3, VRET_FW); }
 inline void Assembler::z_vfmindb(VectorRegister v1, VectorRegister v2, VectorRegister v3)             {z_vfmin(v1, v2, v3, VRET_DW); }
 

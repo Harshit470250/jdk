@@ -11790,6 +11790,43 @@ instruct vmax_reg(vecX dst, vecX src1, vecX src2) %{
       case T_LONG:
         __ z_vmxg($dst$$VectorRegister, $src1$$VectorRegister, $src2$$VectorRegister);
         break;
+      case T_FLOAT:
+        __ z_vfmaxsb($dst$$VectorRegister, $src1$$VectorRegister, $src2$$VectorRegister);
+        break;
+      case T_DOUBLE:
+        __ z_vfmaxdb($dst$$VectorRegister, $src1$$VectorRegister, $src2$$VectorRegister);
+        break;
+      default:
+        ShouldNotReachHere();
+    }
+  %}
+  ins_pipe(pipe_class_dummy);
+%}
+
+instruct vmin_reg(vecX dst, vecX src1, vecX src2) %{
+  match(Set dst (MinV src1 src2));
+  format %{ "VMIN  $dst,$src1,$src2\t// vector max" %}
+  ins_encode %{
+    BasicType bt = Matcher::vector_element_basic_type(this);
+    switch (bt) {
+      case T_BYTE:
+        __ z_vmnb($dst$$VectorRegister, $src1$$VectorRegister, $src2$$VectorRegister);
+        break;
+      case T_SHORT:
+        __ z_vmnh($dst$$VectorRegister, $src1$$VectorRegister, $src2$$VectorRegister);
+        break;
+      case T_INT:
+        __ z_vmnf($dst$$VectorRegister, $src1$$VectorRegister, $src2$$VectorRegister);
+        break;
+      case T_LONG:
+        __ z_vmng($dst$$VectorRegister, $src1$$VectorRegister, $src2$$VectorRegister);
+        break;
+      case T_FLOAT:
+        __ z_vfminsb($dst$$VectorRegister, $src1$$VectorRegister, $src2$$VectorRegister);
+        break;
+      case T_DOUBLE:
+        __ z_vfmindb($dst$$VectorRegister, $src1$$VectorRegister, $src2$$VectorRegister);
+        break;
       default:
         ShouldNotReachHere();
     }
