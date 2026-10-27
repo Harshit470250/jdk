@@ -86,9 +86,9 @@ static const char* z_features[] = {"  ",
                                    "system-z, g7-z13, ldisp_fast, extimm, pcrel_load/store, cmpb, cond_load/store, interlocked_update, txm, vectorinstr",
                                    "system-z, g8-z14, ldisp_fast, extimm, pcrel_load/store, cmpb, cond_load/store, interlocked_update, txm, vectorinstr, instrext2, venh1",
                                    "system-z, g9-z15, ldisp_fast, extimm, pcrel_load/store, cmpb, cond_load/store, interlocked_update, txm, vectorinstr, instrext2, venh1, instrext3, venh2",
-                                   "system-z, g10-z16, ldisp_fast, extimm, pcrel_load/store, cmpb, cond_load/store, interlocked_update, txm, vectorinstr, instrext2, venh1, instrext3, venh2,"
+                                   "system-z, g10-z16, ldisp_fast, extimm, pcrel_load/store, cmpb, cond_load/store, interlocked_update, txm, vectorinstr, instrext2, venh1, instrext3, venh2, "
                                        "bear_enh, sort_enh, nnpa_assist, storage_key_removal, vpack_decimal_enh",
-                                   "system-z, g11-z17, ldisp_fast, extimm, pcrel_load/store, cmpb, cond_load/store, interlocked_update, txm, vectorinstr, instrext2, venh1, instrext3, venh2,"
+                                   "system-z, g11-z17, ldisp_fast, extimm, pcrel_load/store, cmpb, cond_load/store, interlocked_update, txm, vectorinstr, instrext2, venh1, instrext3, venh2, "
                                        "bear_enh, sort_enh, nnpa_assist, storage_key_removal, vpack_decimal_enh, concurrent_function"
                                   };
 

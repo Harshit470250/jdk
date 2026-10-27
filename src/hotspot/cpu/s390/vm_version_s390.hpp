@@ -115,7 +115,7 @@ class VM_Version: public Abstract_VM_Version {
 #define  VectorPackedDecimalEnhMask     0x0000008000000000UL  // z15
 #define  CryptoExtension9Mask           0x0000001000000000UL  // z15 (aka message-security assist extension 9)
 #define  DeflateMask                    0x0000010000000000UL  // z15
-#define NNPAssistFacilityMask           0x0000000004000000UL  // z16, Neural-network-processing-assist facility, Bit: 165
+#define  NNPAssistFacilityMask          0x0000000004000000UL  // z16, Neural-network-processing-assist facility, Bit: 165
 
 // ----------------------------------------------
 // --- FeatureBitString Bits 192..255 (DW[3]) ---

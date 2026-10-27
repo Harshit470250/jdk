@@ -129,7 +129,13 @@ public class ApplicableIRRulesPrinter {
         "zvkn",
         // PPC64
         "darn",
-        "brw"
+        "brw",
+        // S390
+        "vectorinstr",
+        "venh1",
+        "vehn2",
+        "instrext2",
+        "instrext3"
     ));
 
     /**
