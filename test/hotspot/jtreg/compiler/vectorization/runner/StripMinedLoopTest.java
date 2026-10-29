@@ -58,7 +58,7 @@ public class StripMinedLoopTest extends VectorizationTestRunner {
     }
 
     @Test
-    @IR(applyIfCPUFeatureOr = {"asimd", "true", "sse2", "true", "rvv", "true"},
+    @IR(applyIfCPUFeatureOr = {"asimd", "true", "sse2", "true", "rvv", "true", "vectorinstr", "true"},
         counts = {IRNode.STORE_VECTOR, ">0"})
     public int[] stripMinedVectorLoop() {
         int[] res = new int[SIZE];
