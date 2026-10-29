@@ -55,7 +55,7 @@ public class TestVectorLoadStoreOptimization {
     // and optimize out the load with matched store values.
     @Test
     @IR(counts = { IRNode.LOAD_VECTOR_I, "1" },
-        applyIfCPUFeatureOr = {"asimd", "true", "avx", "true", "rvv", "true"})
+        applyIfCPUFeatureOr = {"asimd", "true", "avx", "true", "rvv", "true", "vectorinstr", "true"})
     public static void testLoadVector() {
         IntVector v1 = IntVector.fromArray(SPECIES, a, 0);
         v1.intoArray(a, SPECIES.length());
@@ -79,7 +79,7 @@ public class TestVectorLoadStoreOptimization {
     // which can get rid of previous stores that go to the same position.
     @Test
     @IR(counts = { IRNode.STORE_VECTOR, "1" },
-        applyIfCPUFeatureOr = {"asimd", "true", "avx", "true", "rvv", "true"})
+        applyIfCPUFeatureOr = {"asimd", "true", "avx", "true", "rvv", "true", "vectorinstr", "true"})
     public static void testStoreVector() {
         IntVector v1 = IntVector.fromArray(SPECIES, a, 0 * SPECIES.length());
         IntVector v2 = IntVector.fromArray(SPECIES, a, 1 * SPECIES.length());
@@ -99,7 +99,7 @@ public class TestVectorLoadStoreOptimization {
     // Test that store a value that is just loaded from the same memory location is elided
     @Test
     @IR(failOn = IRNode.STORE_VECTOR,
-        applyIfCPUFeatureOr = {"asimd", "true", "avx", "true", "rvv", "true"})
+        applyIfCPUFeatureOr = {"asimd", "true", "avx", "true", "rvv", "true", "vectorinstr", "true"})
     public static void testStoreVector2() {
         IntVector.fromArray(SPECIES, a, 0).intoArray(a, 0);
     }
