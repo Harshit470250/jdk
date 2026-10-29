@@ -72,7 +72,7 @@ public class TestMemorySegment_ReassociateInvariants2 {
         phase = CompilePhase.PRINT_IDEAL,
         applyIfPlatform = {"64-bit", "true"},
         applyIfAnd = {"AlignVector", "false", "ShortRunningLongLoop", "false"},
-        applyIfCPUFeatureOr = {"avx", "true", "asimd", "true"})
+        applyIfCPUFeatureOr = {"avx", "true", "asimd", "true", "vectorinstr", "true"})
     //
     @IR(counts = {IRNode.STORE_VECTOR, "> 0",
                   IRNode.REPLICATE_S,  "> 0",
@@ -80,7 +80,7 @@ public class TestMemorySegment_ReassociateInvariants2 {
         phase = CompilePhase.PRINT_IDEAL,
         applyIfPlatform = {"64-bit", "true"},
         applyIfAnd = {"AlignVector", "false", "ShortRunningLongLoop", "true"},
-        applyIfCPUFeatureOr = {"avx", "true", "asimd", "true"})
+        applyIfCPUFeatureOr = {"avx", "true", "asimd", "true", "vectorinstr", "true"})
     public static void test(MemorySegment container_0, long invar0_0, MemorySegment container_1, long invar0_1, long ivLo, long ivHi) {
         for (long i = ivHi-1; i >= ivLo; i-=1) {
             container_0.set(ValueLayout.JAVA_CHAR_UNALIGNED, -47143L + -2L * i + -2L * invar0_0 + -1L * invar0_853 + -1L * invar1_853 + 0L * invar2_853, (char)0x0102030405060708L);

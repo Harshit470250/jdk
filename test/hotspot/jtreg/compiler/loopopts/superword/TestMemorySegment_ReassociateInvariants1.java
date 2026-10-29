@@ -71,7 +71,7 @@ public class TestMemorySegment_ReassociateInvariants1 {
         phase = CompilePhase.PRINT_IDEAL,
         applyIfPlatform = {"64-bit", "true"},
         applyIf = {"AlignVector", "false"},
-        applyIfCPUFeatureOr = {"avx", "true", "asimd", "true"})
+        applyIfCPUFeatureOr = {"avx", "true", "asimd", "true", "vectorinstr", "true"})
     // We could imagine that this would eventually vectorize, but since one counts up, and the other down,
     // we would have to implement shuffle first.
     public static void test(MemorySegment container_0, long invar0_0, MemorySegment container_1, long invar0_1, long ivLo, long ivHi) {

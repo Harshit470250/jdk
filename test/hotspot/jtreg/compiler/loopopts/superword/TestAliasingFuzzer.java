@@ -1064,7 +1064,7 @@ public class TestAliasingFuzzer {
                                 phase = CompilePhase.PRINT_IDEAL,
                                 applyIf = {"UseAutoVectorizationPredicate", "true"},
                                 applyIfPlatform = {"64-bit", "true"},
-                                applyIfCPUFeatureOr = {"sse4.1", "true", "asimd", "true"})
+                                applyIfCPUFeatureOr = {"sse4.1", "true", "asimd", "true", "vectorinstr", "true"})
                             """;
                    case Aliasing.CONTAINER_SAME_ALIASING_UNKNOWN,
                          Aliasing.CONTAINER_UNKNOWN_ALIASING_UNKNOWN ->
@@ -1094,14 +1094,14 @@ public class TestAliasingFuzzer {
                                 applyIfAnd = {"UseAutoVectorizationSpeculativeAliasingChecks", "true",
                                               "AlignVector", "false"},
                                 applyIfPlatform = {"64-bit", "true"},
-                                applyIfCPUFeatureOr = {"sse4.1", "true", "asimd", "true"})
+                                applyIfCPUFeatureOr = {"sse4.1", "true", "asimd", "true", "vectorinstr", "true"})
                             """
                         :   """
                             // Bad ivScales, no vectorization expected.
                             @IR(counts = {IRNode.LOAD_VECTOR_#T, "= 0",
                                           IRNode.STORE_VECTOR,   "= 0"},
                                 applyIfPlatform = {"64-bit", "true"},
-                                applyIfCPUFeatureOr = {"sse4.1", "true", "asimd", "true"})
+                                applyIfCPUFeatureOr = {"sse4.1", "true", "asimd", "true", "vectorinstr", "true"})
                             """;
                     case FILL_STORE_STORE ->
                         // Currently, we do not allow strided access.
@@ -1115,14 +1115,14 @@ public class TestAliasingFuzzer {
                                 applyIfAnd = {"UseAutoVectorizationSpeculativeAliasingChecks", "true",
                                               "AlignVector", "false"},
                                 applyIfPlatform = {"64-bit", "true"},
-                                applyIfCPUFeatureOr = {"sse4.1", "true", "asimd", "true"})
+                                applyIfCPUFeatureOr = {"sse4.1", "true", "asimd", "true", "vectorinstr", "true"})
                             """
                         :   """
                             // Bad ivScales, no vectorization expected.
                             @IR(counts = {IRNode.LOAD_VECTOR_#T, "= 0",
                                           IRNode.STORE_VECTOR,   "= 0"},
                                 applyIfPlatform = {"64-bit", "true"},
-                                applyIfCPUFeatureOr = {"sse4.1", "true", "asimd", "true"})
+                                applyIfCPUFeatureOr = {"sse4.1", "true", "asimd", "true", "vectorinstr", "true"})
                             """;
                 }
             ));

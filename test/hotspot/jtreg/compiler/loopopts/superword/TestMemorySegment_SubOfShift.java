@@ -67,7 +67,7 @@ public class TestMemorySegment_SubOfShift {
         phase = CompilePhase.PRINT_IDEAL,
         applyIfPlatform = {"64-bit", "true"},
         applyIf = {"AlignVector", "false"},
-        applyIfCPUFeatureOr = {"avx", "true", "asimd", "true"})
+        applyIfCPUFeatureOr = {"avx", "true", "asimd", "true", "vectorinstr", "true"})
     public static void test1(MemorySegment b, int ivLo, int ivHi, int invar) {
         for (int i = ivLo; i < ivHi; i++) {
             b.setAtIndex(ValueLayout.JAVA_LONG_UNALIGNED, 30_000L - (long)i + (long)invar, 42);
@@ -83,7 +83,7 @@ public class TestMemorySegment_SubOfShift {
         phase = CompilePhase.PRINT_IDEAL,
         applyIfPlatform = {"64-bit", "true"},
         applyIf = {"AlignVector", "false"},
-        applyIfCPUFeatureOr = {"avx", "true", "asimd", "true"})
+        applyIfCPUFeatureOr = {"avx", "true", "asimd", "true", "vectorinstr", "true"})
     // Is fully RFE'd and vectorized
     public static void test2(MemorySegment b, int ivLo, int ivHi, int invar) {
         for (int i = ivLo; i < ivHi; i++) {

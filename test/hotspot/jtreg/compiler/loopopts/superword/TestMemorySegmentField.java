@@ -57,7 +57,7 @@ public class TestMemorySegmentField {
                   IRNode.ADD_VB,        "> 0",
                   IRNode.STORE_VECTOR,  "> 0"},
         applyIfPlatform = {"64-bit", "true"},
-        applyIfCPUFeatureOr = {"sse4.1", "true", "asimd", "true", "rvv", "true"})
+        applyIfCPUFeatureOr = {"sse4.1", "true", "asimd", "true", "rvv", "true", "vectorinstr", "true"})
     public static void testFields() {
         int invar = zeroInvarI;
         for (long i = 0; i < MS.byteSize(); i++) {
