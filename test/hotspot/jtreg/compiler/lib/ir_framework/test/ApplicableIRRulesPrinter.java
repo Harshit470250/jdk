@@ -133,7 +133,7 @@ public class ApplicableIRRulesPrinter {
         // S390
         "vectorinstr",
         "venh1",
-        "vehn2",
+        "venh2",
         "instrext2",
         "instrext3"
     ));
