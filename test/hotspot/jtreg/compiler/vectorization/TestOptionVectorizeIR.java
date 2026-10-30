@@ -567,7 +567,7 @@ public class TestOptionVectorizeIR {
     @Test
     @IR(counts = {IRNode.LOAD_VECTOR_F, "> 0", IRNode.ADD_VF, "> 0", IRNode.STORE_VECTOR, "> 0"},
         applyIf = {"AlignVector", "false"},
-        applyIfCPUFeatureOr = {"sse4.1", "true", "asimd", "true", "rvv", "true", "vectorinstr", "true"})
+        applyIfCPUFeatureOr = {"sse4.1", "true", "asimd", "true", "rvv", "true", "venh1", "true"})
     static void test50(float[] data) {
        for (int j = 2; j < RANGE - 2; j++) {
            data[j] += data[j + 2];
@@ -577,7 +577,7 @@ public class TestOptionVectorizeIR {
     @Test
     @IR(counts = {IRNode.LOAD_VECTOR_F, "> 0", IRNode.ADD_VF, "> 0", IRNode.STORE_VECTOR, "> 0"},
         applyIf = {"AlignVector", "false"},
-        applyIfCPUFeatureOr = {"sse4.1", "true", "asimd", "true", "rvv", "true", "vectorinstr", "true"})
+        applyIfCPUFeatureOr = {"sse4.1", "true", "asimd", "true", "rvv", "true", "venh1", "true"})
     static void test51(float[] data) {
        for (int j = 2; j < RANGE - 2; j++) {
            data[j] += data[j + 1];
